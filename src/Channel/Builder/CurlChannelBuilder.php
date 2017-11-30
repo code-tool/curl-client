@@ -44,7 +44,7 @@ class CurlChannelBuilder
         return $this;
     }
 
-    public function option(int $option, $value)
+    public function option(int $option, $value): CurlChannelBuilder
     {
         $this->options[$option] = $value;
 
@@ -73,7 +73,7 @@ class CurlChannelBuilder
         return $this;
     }
 
-    public function setOptions()
+    public function setOptions(): CurlChannelBuilder
     {
         $this->options[CURLOPT_HEADER] = false;
         $this->options[CURLOPT_RETURNTRANSFER] = false;
