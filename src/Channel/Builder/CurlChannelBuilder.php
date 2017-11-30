@@ -85,7 +85,6 @@ class CurlChannelBuilder
     public function setOptions(): CurlChannelBuilder
     {
         $this->options[CURLOPT_HEADER] = false;
-        $this->options[CURLOPT_RETURNTRANSFER] = false;
         $this->options[CURLOPT_FOLLOWLOCATION] = false;
 
         curl_setopt_array($this->channel, $this->options);
@@ -112,7 +111,7 @@ class CurlChannelBuilder
 
     public function setUrl(): CurlChannelBuilder
     {
-        $this->options[CURLOPT_URL] = (string)$this->request->getUri()->__toString();
+        $this->options[CURLOPT_URL] = $this->request->getUri()->__toString();
 
         return $this;
     }
