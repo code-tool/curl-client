@@ -72,6 +72,7 @@ class CurlChannelBuilder
 
         return $this;
     }
+
     /**
      * @param array $options
      *
@@ -184,11 +185,12 @@ class CurlChannelBuilder
     }
 
 
-/**
+    /**
      * @param array $options
      *
      * @return CurlChannelBuilder
-     */    public function setMethod()
+     */
+    public function setMethod()
     {
         switch (strtoupper($this->request->getMethod())) {
             case 'GET':

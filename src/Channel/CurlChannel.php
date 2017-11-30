@@ -29,16 +29,35 @@ class CurlChannel
         $this->response = $response;
     }
 
+    /**
+     * @param resource $channel
+     * @param resource $fileDescriptor
+     * @param int $length
+     *
+     * @return string
+     */
     public function read($channel, $fileDescriptor, $length)
     {
         return $this->request->getBody()->read($length);
     }
 
+    /**
+     * @param resource $channel
+     * @param string $data
+     *
+     * @return int
+     */
     public function write($channel, $data)
     {
         return $this->response->getBody()->write($data);
     }
 
+    /**
+     * @param resource $channel
+     * @param string $data
+     *
+     * @return int
+     */
     public function headers($channel, $data)
     {
         $str = trim($data);
