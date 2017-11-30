@@ -79,6 +79,8 @@ class CurlChannelBuilder
         $this->options[CURLOPT_RETURNTRANSFER] = false;
         $this->options[CURLOPT_FOLLOWLOCATION] = false;
 
+        curl_setopt_array($this->channel, $this->options);
+
         return $this;
     }
 
@@ -174,17 +176,18 @@ class CurlChannelBuilder
         $this
             ->consistent()
             ->reset()
-            ->setOptions()
             ->setHttpVersion()
             ->setUrl()
             ->setHeaders()
             ->setUserInfo()
-            ->setCallbacks();
+            ->setCallbacks()
+            ->setOptions();
 
         $channel = new CurlChannel($this->channel, $this->request, $this->response);
         $this->request = null;
         $this->response = null;
         $this->channel = null;
+        $this->options = [];
 
         return $channel;
     }
