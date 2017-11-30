@@ -22,6 +22,8 @@ class CurlChannelBuilder
      */
     private $response;
 
+    private $result;
+
     /**
      * @param $channel
      *
@@ -188,32 +190,16 @@ class CurlChannelBuilder
     public function setCallbacks()
     {
         $this->options[CURLOPT_HEADERFUNCTION] = function ($channel, $data) {
-            $str = trim($data);
-            if ('' !== $str) {
-                if (strpos(strtolower($str), 'http/') === 0) {
-                    list ($protocol, $code,) = explode(' ', $str, 3);
-                    $this->response = $this->response->withStatus((int)$code);
-                } else {
-                    list ($name, $value,) = explode(':', $str, 2);
-                    $name = trim($name);
-                    $value = trim($value);
-                    if ($this->response->hasHeader($name)) {
-                        $this->response = $this->response->withAddedHeader($name, $value);
-                    } else {
-                        $this->response = $this->response->withHeader($name, $value);
-                    }
-                }
-            }
-
-            return strlen($data);
+            return $this->result->headers($channel, $data);
         };
 
         $this->options[CURLOPT_WRITEFUNCTION] = function ($channel, $data) {
-            return $this->response->getBody()->write($data);
+            return $this->result->write($channel, $data);
+
         };
 
         $this->options[CURLOPT_READFUNCTION] = function ($channel, $fileDescriptor, $length) {
-            return $this->request->getBody()->read($length);
+            return $this->result->read($channel, $fileDescriptor, $data);
         };
 
         return $this;
@@ -225,8 +211,11 @@ class CurlChannelBuilder
     public function getChannel()
     {
         $this
-            ->consistent()
-            ->reset()
+            ->consistent();
+
+        $this->result = new CurlChannel($this->channel, $this->request, $this->response);
+
+        $this->reset()
             ->setHttpVersion()
             ->setUrl()
             ->setHeaders()
@@ -234,8 +223,6 @@ class CurlChannelBuilder
             ->setCallbacks()
             ->setOptions();
 
-        $channel = new CurlChannel($this->channel, $this->request, $this->response);
-
-        return $channel;
+        return $this->result;
     }
 }
