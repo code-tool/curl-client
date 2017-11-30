@@ -1,5 +1,4 @@
 <?php
-declare(strict_types=1);
 
 namespace Http\Client\Curl\Decorator;
 
@@ -27,14 +26,26 @@ abstract class AbstractCurlClientDecorator implements CurlClientInterface
         return $this->curlClient->sendRequest($request);
     }
 
-    public function setOption(int $option, $value): CurlClientInterface
+    /**
+     * @param int   $option
+     * @param mixed $value
+     *
+     * @return CurlClientInterface
+     */
+    public function setOption($option, $value)
     {
         $this->curlClient->setOption($option, $value);
 
         return $this;
     }
 
-    public function setRequestOption(int $option, $value): CurlClientInterface
+    /**
+     * @param int   $option
+     * @param mixed $value
+     *
+     * @return CurlClientInterface
+     */
+    public function setRequestOption($option, $value)
     {
         $this->curlClient->setRequestOption($option, $value);
 

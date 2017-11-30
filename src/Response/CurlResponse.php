@@ -1,6 +1,4 @@
 <?php
-declare(strict_types=1);
-
 namespace Http\Client\Curl\Response;
 
 use Psr\Http\Message\ResponseInterface;
@@ -106,7 +104,10 @@ class CurlResponse implements ResponseInterface
         return $this->response->getReasonPhrase();
     }
 
-    public function getCurlInfo(): array
+    /**
+     * @return array
+     */
+    public function getCurlInfo()
     {
         return $this->curlInfo;
     }

@@ -1,6 +1,4 @@
 <?php
-declare(strict_types=1);
-
 namespace Http\Client\Curl\Options;
 
 use Http\Client\Curl\Response\CurlResponse;
@@ -31,7 +29,10 @@ class CurlChannel
         $this->response = $response;
     }
 
-    public function send(): CurlResponse
+    /**
+     * @return CurlResponse
+     */
+    public function send()
     {
         curl_exec($this->channel);
         switch (curl_errno($this->channel)) {

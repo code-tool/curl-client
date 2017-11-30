@@ -1,5 +1,4 @@
 <?php
-declare(strict_types=1);
 
 namespace Http\Client\Curl\Channel\Builder;
 
@@ -23,35 +22,59 @@ class CurlChannelBuilder
      */
     private $response;
 
-    public function channel($channel): CurlChannelBuilder
+    /**
+     * @param $channel
+     *
+     * @return CurlChannelBuilder
+     */
+    public function channel($channel)
     {
         $this->channel = $channel;
 
         return $this;
     }
 
-    public function request(RequestInterface $request): CurlChannelBuilder
+    /**
+     * @param RequestInterface $request
+     *
+     * @return CurlChannelBuilder
+     */
+    public function request(RequestInterface $request)
     {
         $this->request = $request;
 
         return $this;
     }
 
-    public function response(ResponseInterface $response): CurlChannelBuilder
+    /**
+     * @param ResponseInterface $response
+     *
+     * @return CurlChannelBuilder
+     */
+    public function response(ResponseInterface $response)
     {
         $this->response = $response;
 
         return $this;
     }
 
-    public function option(int $option, $value)
+    /**
+     * @param int   $option
+     * @param mixed $value
+     *
+     * @return CurlChannelBuilder
+     */
+    public function option($option, $value)
     {
         $this->options[$option] = $value;
 
         return $this;
     }
 
-    public function consistent(): CurlChannelBuilder
+    /**
+     * @return CurlChannelBuilder
+     */
+    public function consistent()
     {
         if (false === is_resource($this->channel)) {
             throw new \RuntimeException('You forgot to set channel resource');
@@ -66,13 +89,19 @@ class CurlChannelBuilder
         return $this;
     }
 
-    public function reset(): CurlChannelBuilder
+    /**
+     * @return CurlChannelBuilder
+     */
+    public function reset()
     {
         curl_reset($this->channel);
 
         return $this;
     }
 
+    /**
+     * @return CurlChannelBuilder
+     */
     public function setOptions()
     {
         $this->options[CURLOPT_HEADER] = false;
@@ -82,7 +111,10 @@ class CurlChannelBuilder
         return $this;
     }
 
-    public function setHttpVersion(): CurlChannelBuilder
+    /**
+     * @return CurlChannelBuilder
+     */
+    public function setHttpVersion()
     {
         switch ($this->request->getProtocolVersion()) {
             case '1.0':
@@ -99,14 +131,20 @@ class CurlChannelBuilder
         return $this;
     }
 
-    public function setUrl(): CurlChannelBuilder
+    /**
+     * @return CurlChannelBuilder
+     */
+    public function setUrl()
     {
         $this->options[CURLOPT_URL] = (string)$this->request->getUri()->__toString();
 
         return $this;
     }
 
-    public function setHeaders(): CurlChannelBuilder
+    /**
+     * @return CurlChannelBuilder
+     */
+    public function setHeaders()
     {
         foreach ($this->request->getHeaders() as $name => $values) {
             foreach ($values as $value) {
@@ -117,7 +155,10 @@ class CurlChannelBuilder
         return $this;
     }
 
-    public function setUserInfo(): CurlChannelBuilder
+    /**
+     * @return CurlChannelBuilder
+     */
+    public function setUserInfo()
     {
         if ('' === ($userInfo = $this->request->getUri()->getUserInfo())) {
             return $this;
@@ -127,16 +168,22 @@ class CurlChannelBuilder
         return $this;
     }
 
-
-    public function options(array $options): CurlChannelBuilder
+    /**
+     * @param array $options
+     *
+     * @return CurlChannelBuilder
+     */
+    public function options(array $options)
     {
         $this->options = $options;
 
         return $this;
     }
 
-
-    public function setCallbacks(): CurlChannelBuilder
+    /**
+     * @return CurlChannelBuilder
+     */
+    public function setCallbacks()
     {
         $options[CURLOPT_HEADERFUNCTION] = function ($channel, $data) {
             $str = trim($data);
@@ -169,7 +216,10 @@ class CurlChannelBuilder
         return $this;
     }
 
-    public function getChannel(): CurlChannel
+    /**
+     * @return CurlChannel
+     */
+    public function getChannel()
     {
         $this
             ->consistent()

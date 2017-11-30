@@ -1,6 +1,4 @@
 <?php
-declare(strict_types=1);
-
 namespace Http\Client\Curl;
 
 use Http\Client\Curl\Response\CurlResponse;
@@ -14,7 +12,19 @@ use Psr\Http\Message\RequestInterface;
  */
 interface CurlClientInterface extends HttpClientInterface
 {
-    public function setOption(int $option, $value): CurlClientInterface;
+    /**
+     * @param int   $option
+     * @param mixed $value
+     *
+     * @return CurlClientInterface
+     */
+    public function setOption($option, $value);
 
-    public function setRequestOption(int $option, $value): CurlClientInterface;
+    /**
+     * @param int   $option
+     * @param mixed $value
+     *
+     * @return CurlClientInterface
+     */
+    public function setRequestOption($option, $value);
 }

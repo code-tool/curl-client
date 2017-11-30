@@ -1,5 +1,4 @@
 <?php
-declare(strict_types=1);
 
 namespace Http\Client\Curl;
 
@@ -38,16 +37,28 @@ class CurlClient implements CurlClientInterface
         curl_close($this->resource);
     }
 
-    public function setOption(int $option, $value): CurlClientInterface
+    /**
+     * @param int   $option
+     * @param mixed $value
+     *
+     * @return CurlClientInterface
+     */
+    public function setOption($option, $value)
     {
-        $this->options[$option] = $value;
+        $this->options[(int)$option] = $value;
 
         return $this;
     }
 
-    public function setRequestOption(int $option, $value): CurlClientInterface
+    /**
+     * @param int   $option
+     * @param mixed $value
+     *
+     * @return CurlClientInterface
+     */
+    public function setRequestOption($option, $value)
     {
-        $this->requestOptions[$option] = $value;
+        $this->requestOptions[(int)$option] = $value;
 
         return $this;
     }
