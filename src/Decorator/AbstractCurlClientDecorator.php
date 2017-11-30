@@ -2,7 +2,6 @@
 
 namespace Http\Client\Curl\Decorator;
 
-use Http\Client\Curl\CurlClient;
 use Http\Client\Curl\CurlClientInterface;
 use Http\Client\Curl\Response\CurlResponse;
 use Psr\Http\Message\RequestInterface;
@@ -11,7 +10,7 @@ abstract class AbstractCurlClientDecorator implements CurlClientInterface
 {
     private $curlClient;
 
-    public function __construct(CurlClient $curlClient)
+    public function __construct(CurlClientInterface $curlClient)
     {
         $this->curlClient = $curlClient;
     }
