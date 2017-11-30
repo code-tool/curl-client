@@ -72,6 +72,17 @@ class CurlChannelBuilder
 
         return $this;
     }
+    /**
+     * @param array $options
+     *
+     * @return CurlChannelBuilder
+     */
+    public function options(array $options)
+    {
+        $this->options = $options;
+
+        return $this;
+    }
 
     /**
      * @return CurlChannelBuilder
@@ -172,14 +183,41 @@ class CurlChannelBuilder
         return $this;
     }
 
-    /**
+
+/**
      * @param array $options
      *
      * @return CurlChannelBuilder
-     */
-    public function options(array $options)
+     */    public function setMethod()
     {
-        $this->options = $options;
+        switch (strtoupper($this->request->getMethod())) {
+            case 'GET':
+                break;
+            case 'HEAD':
+                $this->options[CURLOPT_NOBODY] = true;
+                break;
+            default:
+                $this->options[CURLOPT_CUSTOMREQUEST] = $this->request->getMethod();
+                break;
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return CurlChannelBuilder
+     */
+    public function setBodySize()
+    {
+        if (in_array(strtoupper($this->request->getMethod()), ['GET', 'HEAD', 'TRACE'])) {
+            return $this;
+        }
+
+        $this->options[CURLOPT_UPLOAD] = true;
+        if (null === ($size = $this->request->getBody()->getSize())) {
+            return $this;
+        }
+        $this->options[CURLOPT_INFILESIZE] = $size;
 
         return $this;
     }
@@ -189,18 +227,9 @@ class CurlChannelBuilder
      */
     public function setCallbacks()
     {
-        $this->options[CURLOPT_HEADERFUNCTION] = function ($channel, $data) {
-            return $this->result->headers($channel, $data);
-        };
-
-        $this->options[CURLOPT_WRITEFUNCTION] = function ($channel, $data) {
-            return $this->result->write($channel, $data);
-
-        };
-
-        $this->options[CURLOPT_READFUNCTION] = function ($channel, $fileDescriptor, $length) {
-            return $this->result->read($channel, $fileDescriptor, $data);
-        };
+        $this->options[CURLOPT_HEADERFUNCTION] = [$this->result, 'headers'];
+        $this->options[CURLOPT_WRITEFUNCTION] = [$this->result, 'write'];
+        $this->options[CURLOPT_READFUNCTION] = [$this->result, 'read'];
 
         return $this;
     }
@@ -216,6 +245,8 @@ class CurlChannelBuilder
         $this->result = new CurlChannel($this->channel, $this->request, $this->response);
 
         $this->reset()
+            ->setMethod()
+            ->setBodySize()
             ->setHttpVersion()
             ->setUrl()
             ->setHeaders()
