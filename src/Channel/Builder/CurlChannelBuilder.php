@@ -187,11 +187,12 @@ class CurlChannelBuilder
      */
     public function setCallbacks()
     {
-        $options[CURLOPT_HEADERFUNCTION] = function ($channel, $data) {
+        $this->options[CURLOPT_HEADERFUNCTION] = function ($channel, $data) {
             $str = trim($data);
             if ('' !== $str) {
                 if (strpos(strtolower($str), 'http/') === 0) {
-                    $this->response = $this->response->withStatus((int)$str);
+                    list ($protocol, $code,) = explode(' ', $str, 3);
+                    $this->response = $this->response->withStatus((int)$code);
                 } else {
                     list ($name, $value,) = explode(':', $str, 2);
                     $name = trim($name);
@@ -207,11 +208,11 @@ class CurlChannelBuilder
             return strlen($data);
         };
 
-        $options[CURLOPT_WRITEFUNCTION] = function ($channel, $data) {
+        $this->options[CURLOPT_WRITEFUNCTION] = function ($channel, $data) {
             return $this->response->getBody()->write($data);
         };
 
-        $options[CURLOPT_READFUNCTION] = function ($channel, $fileDescriptor, $length) {
+        $this->options[CURLOPT_READFUNCTION] = function ($channel, $fileDescriptor, $length) {
             return $this->request->getBody()->read($length);
         };
 
@@ -234,10 +235,6 @@ class CurlChannelBuilder
             ->setOptions();
 
         $channel = new CurlChannel($this->channel, $this->request, $this->response);
-        $this->request = null;
-        $this->response = null;
-        $this->channel = null;
-        $this->options = [];
 
         return $channel;
     }
