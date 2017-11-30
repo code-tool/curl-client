@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Http\Client\Curl\Options;
+namespace Http\Client\Curl\Channel;
 
 use Http\Client\Curl\Response\CurlResponse;
 use Http\Client\Exception\NetworkException;

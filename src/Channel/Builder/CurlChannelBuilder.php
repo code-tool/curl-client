@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace Http\Client\Curl\Channel\Builder;
 
-use Http\Client\Curl\Options\CurlChannel;
+use Http\Client\Curl\Channel\CurlChannel;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 
