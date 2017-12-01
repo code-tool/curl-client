@@ -82,6 +82,7 @@ class CurlClient implements CurlClientInterface
             ->getChannel()
             ->send();
 
+        $response->getBody()->rewind();
         $this->requestOptions = [];
 
         return $response;
