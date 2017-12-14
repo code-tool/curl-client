@@ -116,6 +116,17 @@ class CurlChannelBuilder
     /**
      * @return CurlChannelBuilder
      */
+    public function rewind()
+    {
+        $this->request->getBody()->rewind();
+        $this->response->getBody()->rewind();
+
+        return $this;
+    }
+
+    /**
+     * @return CurlChannelBuilder
+     */
     public function setOptions()
     {
         $this->options[CURLOPT_HEADER] = false;
@@ -245,7 +256,9 @@ class CurlChannelBuilder
 
         $this->result = new CurlChannel($this->channel, $this->request, $this->response);
 
-        $this->reset()
+        $this
+            ->reset()
+            ->rewind()
             ->setMethod()
             ->setBodySize()
             ->setHttpVersion()
