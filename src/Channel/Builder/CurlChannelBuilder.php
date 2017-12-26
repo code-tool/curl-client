@@ -95,9 +95,10 @@ class CurlChannelBuilder
      */
     public function setOptions()
     {
-        $this->options[CURLOPT_HEADER] = false;
+        if (false === array_key_exists(CURLOPT_HEADER, $this->options)) {
+            $this->options[CURLOPT_HEADER] = false;
+        }
         $this->options[CURLOPT_FOLLOWLOCATION] = false;
-
         curl_setopt_array($this->channel, $this->options);
 
         return $this;
