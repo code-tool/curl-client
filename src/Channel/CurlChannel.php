@@ -61,20 +61,24 @@ class CurlChannel
     public function headers($channel, $data)
     {
         $str = trim($data);
-        if ('' !== $str) {
-            if (strpos(strtolower($str), 'http/') === 0) {
-                list ($protocol, $code,) = explode(' ', $str, 3);
-                $this->response = $this->response->withStatus((int)$code);
-            } else {
-                list ($name, $value,) = explode(':', $str, 2);
-                $name = trim($name);
-                $value = trim($value);
-                if ($this->response->hasHeader($name)) {
-                    $this->response = $this->response->withAddedHeader($name, $value);
-                } else {
-                    $this->response = $this->response->withHeader($name, $value);
-                }
-            }
+        if ('' === $str) {
+            return strlen($data);
+        }
+
+        if (strpos(strtolower($str), 'http/') === 0) {
+            list ($protocol, $code,) = explode(' ', $str, 3);
+            $this->response = $this->response->withStatus((int)$code);
+
+            return strlen($data);
+        }
+
+        list ($name, $value,) = explode(':', $str, 2);
+        $name = trim($name);
+        $value = trim($value);
+        if ($this->response->hasHeader($name)) {
+            $this->response = $this->response->withAddedHeader($name, $value);
+        } else {
+            $this->response = $this->response->withHeader($name, $value);
         }
 
         return strlen($data);
