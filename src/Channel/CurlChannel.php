@@ -31,33 +31,37 @@ class CurlChannel
         $this->response = $response;
     }
 
-    public function read($channel, $fileDescriptor, $length)
+    public function read($channel, $fileDescriptor, $length) : string
     {
         return $this->request->getBody()->read($length);
     }
 
-    public function write($channel, $data)
+    public function write($channel, $data) : int
     {
         return $this->response->getBody()->write($data);
     }
 
-    public function headers($channel, $data)
+    public function headers($channel, $data) : int
     {
         $str = trim($data);
-        if ('' !== $str) {
-            if (strpos(strtolower($str), 'http/') === 0) {
-                list ($protocol, $code,) = explode(' ', $str, 3);
-                $this->response = $this->response->withStatus((int)$code);
-            } else {
-                list ($name, $value,) = explode(':', $str, 2);
-                $name = trim($name);
-                $value = trim($value);
-                if ($this->response->hasHeader($name)) {
-                    $this->response = $this->response->withAddedHeader($name, $value);
-                } else {
-                    $this->response = $this->response->withHeader($name, $value);
-                }
-            }
+        if ('' === $str) {
+            return strlen($data);
+        }
+
+        if (strpos(strtolower($str), 'http/') === 0) {
+            list ($protocol, $code,) = explode(' ', $str, 3);
+            $this->response = $this->response->withStatus((int)$code);
+
+            return strlen($data);
+        }
+
+        list ($name, $value,) = explode(':', $str, 2);
+        $name = trim($name);
+        $value = trim($value);
+        if ($this->response->hasHeader($name)) {
+            $this->response = $this->response->withAddedHeader($name, $value);
+        } else {
+            $this->response = $this->response->withHeader($name, $value);
         }
 
         return strlen($data);
