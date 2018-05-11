@@ -16,8 +16,6 @@ class RequestBuilder
 
     private $body;
 
-    private $retries = 1;
-
     private $headers = [];
 
     private $options = [];
@@ -286,7 +284,6 @@ class RequestBuilder
 
         $this->method = $this->uri = $this->body = null;
         $this->headers = $this->options = [];
-        $this->retries = 1;
         $this->protocol = '1.1';
 
         return new CurlRequest($request, $this->options);
