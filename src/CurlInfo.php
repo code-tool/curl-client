@@ -85,19 +85,19 @@ class CurlInfo implements \ArrayAccess, \Countable, \IteratorAggregate
         unset($this->info[$offset]);
     }
 
-    public function url(): ?string
+    public function url(): string
     {
-        return $this->get(self::CURL_URL);
+        return (string)$this->get(self::CURL_URL);
     }
 
-    public function contentType(): ?string
+    public function contentType(): string
     {
-        return $this->get(self::CURL_CONTENT_TYPE);
+        return (string)$this->get(self::CURL_CONTENT_TYPE);
     }
 
-    public function httpCode(): ?int
+    public function httpCode(): int
     {
-        return $this->get(self::CURL_HTTP_CODE);
+        return (int)$this->get(self::CURL_HTTP_CODE);
     }
 
     public function headerSize()
@@ -185,9 +185,9 @@ class CurlInfo implements \ArrayAccess, \Countable, \IteratorAggregate
         return (float)$this->get(self::CURL_REDIRECT_TIME);
     }
 
-    public function redirectUrl(): ?string
+    public function redirectUrl(): string
     {
-        return $this->get(self::CURL_REDIRECT_URL);
+        return (string)$this->get(self::CURL_REDIRECT_URL);
     }
 
     public function primaryIp(): string
