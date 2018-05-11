@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Http\Client\Curl\Response;
 
+use Http\Client\Curl\CurlInfo;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\StreamInterface;
 
@@ -12,7 +13,7 @@ class CurlResponse implements ResponseInterface
 
     private $curlInfo;
 
-    public function __construct(ResponseInterface $response, array $curlInfo)
+    public function __construct(ResponseInterface $response, CurlInfo $curlInfo)
     {
         $this->response = $response;
         $this->curlInfo = $curlInfo;
@@ -106,7 +107,7 @@ class CurlResponse implements ResponseInterface
         return $this->response->getReasonPhrase();
     }
 
-    public function getCurlInfo(): array
+    public function curlInfo(): CurlInfo
     {
         return $this->curlInfo;
     }

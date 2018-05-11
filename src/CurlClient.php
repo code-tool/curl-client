@@ -4,11 +4,13 @@ declare(strict_types=1);
 namespace Http\Client\Curl;
 
 use Http\Client\Curl\Channel\Builder\CurlChannelBuilder;
+use Http\Client\Curl\Request\CurlRequest;
 use Http\Client\Curl\Response\CurlResponse;
+use Http\Client\HttpClient;
 use Http\Message\ResponseFactory as ResponseFactoryInterface;
 use Psr\Http\Message\RequestInterface;
 
-class CurlClient implements CurlClientInterface
+class CurlClient implements CurlClientInterface, HttpClient
 {
     private $resource;
 
@@ -38,18 +40,11 @@ class CurlClient implements CurlClientInterface
         curl_close($this->resource);
     }
 
-    public function setOption(int $option, $value): CurlClientInterface
+    public function send(CurlRequest $request): CurlResponse
     {
-        $this->options[$option] = $value;
+        $this->requestOptions = $request->options();
 
-        return $this;
-    }
-
-    public function setRequestOption(int $option, $value): CurlClientInterface
-    {
-        $this->requestOptions[$option] = $value;
-
-        return $this;
+        return $this->sendRequest($request);
     }
 
     /**
