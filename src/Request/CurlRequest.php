@@ -1,6 +1,4 @@
 <?php
-declare(strict_types=1);
-
 namespace Http\Client\Curl\Request;
 
 use Psr\Http\Message\RequestInterface;
@@ -19,7 +17,10 @@ class CurlRequest implements RequestInterface
         $this->options = $options;
     }
 
-    public function options(): array
+    /**
+     * @return array
+     */
+    public function options()
     {
         return $this->options;
     }

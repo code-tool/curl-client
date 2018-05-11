@@ -1,6 +1,4 @@
 <?php
-declare(strict_types=1);
-
 namespace Http\Client\Curl\Request\Builder;
 
 use Http\Client\Curl\Request\CurlRequest;
@@ -16,8 +14,6 @@ class RequestBuilder
 
     private $body;
 
-    private $retries = 1;
-
     private $headers = [];
 
     private $options = [];
@@ -29,7 +25,14 @@ class RequestBuilder
         $this->requestFactory = $requestFactory;
     }
 
-    public function auth(string $username, string $password, string $type = ''): RequestBuilder
+    /**
+     * @param string $username
+     * @param string $password
+     * @param string $type
+     *
+     * @return RequestBuilder
+     */
+    public function auth($username, $password, $type = '')
     {
         $this->curl(CURLOPT_USERPWD, sprintf('%s:%s', $username, $password));
         if ('' !== $type) {
@@ -39,128 +42,228 @@ class RequestBuilder
         return $this;
     }
 
-    public function user(string $username, string $password): RequestBuilder
+    /**
+     * @param string $username
+     * @param string $password
+     *
+     * @return RequestBuilder
+     */
+    public function user($username, $password)
     {
         return $this->curl(CURLOPT_USERPWD, sprintf('%s:%s', $username, $password));
     }
 
-    public function authType(string $authType): RequestBuilder
+    /**
+     * @param string $authType
+     *
+     * @return RequestBuilder
+     */
+    public function authType($authType)
     {
         return $this->curl(CURLOPT_HTTPAUTH, $authType);
     }
 
-    public function method(string $method): RequestBuilder
+    /**
+     * @param string $method
+     *
+     * @return RequestBuilder
+     */
+    public function method($method)
     {
         $this->method = $method;
 
         return $this;
     }
 
-    public function delete(): RequestBuilder
+    /**
+     * @return RequestBuilder
+     */
+    public function delete()
     {
         return $this->method('DELETE');
     }
 
-    public function get(): RequestBuilder
+    /**
+     * @return RequestBuilder
+     */
+    public function get()
     {
         return $this->method('GET');
     }
 
-    public function head(): RequestBuilder
+    /**
+     * @return RequestBuilder
+     */
+    public function head()
     {
         return $this->method('HEAD');
     }
 
-    public function patch(): RequestBuilder
+    /**
+     * @return RequestBuilder
+     */
+    public function patch()
     {
         return $this->method('PATCH');
     }
 
-    public function post(): RequestBuilder
+    /**
+     * @return RequestBuilder
+     */
+    public function post()
     {
         return $this->method('POST');
     }
 
-    public function put(): RequestBuilder
+    /**
+     * @return RequestBuilder
+     */
+    public function put()
     {
         return $this->method('PUT');
     }
 
-    public function options(): RequestBuilder
+    /**
+     * @return RequestBuilder
+     */
+    public function options()
     {
         return $this->method('OPTIONS');
     }
 
-    public function body($body): RequestBuilder
+    /**
+     * @param $body
+     *
+     * @return RequestBuilder
+     */
+    public function body($body)
     {
         $this->body = $body;
 
         return $this;
     }
 
-    public function timeout(float $sec): RequestBuilder
+    /**
+     * @param float $sec
+     *
+     * @return RequestBuilder
+     */
+    public function timeout($sec)
     {
         return $this->timeoutMs((int)($sec * 1000));
     }
 
-    public function timeoutMs(int $msec): RequestBuilder
+    /**
+     * @param int $msec
+     *
+     * @return RequestBuilder
+     */
+    public function timeoutMs($msec)
     {
         $this->options[CURLOPT_TIMEOUT_MS] = $msec;
 
         return $this;
     }
 
-    public function connect(float $sec): RequestBuilder
+    /**
+     * @param float $sec
+     *
+     * @return RequestBuilder
+     */
+    public function connect($sec)
     {
         return $this->connectMs((int)($sec * 1000));
     }
 
-    public function connectMs(int $msec): RequestBuilder
+    /**
+     * @param int $msec
+     *
+     * @return RequestBuilder
+     */
+    public function connectMs($msec)
     {
         $this->options[CURLOPT_CONNECTTIMEOUT_MS] = $msec;
 
         return $this;
     }
 
-    public function header(string $name, string $value): RequestBuilder
+    /**
+     * @param string $name
+     * @param string $value
+     *
+     * @return RequestBuilder
+     */
+    public function header($name, $value)
     {
         $this->headers[$name] = $value;
 
         return $this;
     }
 
-    public function headers(array $headers): RequestBuilder
+    /**
+     * @param array $headers
+     *
+     * @return RequestBuilder
+     */
+    public function headers(array $headers)
     {
         $this->headers = $headers;
 
         return $this;
     }
 
-    public function authorization(string $value): RequestBuilder
+    /**
+     * @param string $value
+     *
+     * @return RequestBuilder
+     */
+    public function authorization($value)
     {
         return $this->header('Authorization', $value);
     }
 
-    public function contentType(string $value): RequestBuilder
+    /**
+     * @param string $value
+     *
+     * @return RequestBuilder
+     */
+    public function contentType($value)
     {
         return $this->header('Content-Type', $value);
     }
 
-    public function curl(int $option, $value): RequestBuilder
+    /**
+     * @param int $option
+     * @param     $value
+     *
+     * @return RequestBuilder
+     */
+    public function curl($option, $value)
     {
         $this->options[$option] = $value;
 
         return $this;
     }
 
-    public function curls(array $options): RequestBuilder
+    /**
+     * @param array $options
+     *
+     * @return RequestBuilder
+     */
+    public function curls(array $options)
     {
         $this->options = $options;
 
         return $this;
     }
 
-    public function uri(string $uri, array $parameters = []): RequestBuilder
+    /**
+     * @param string $uri
+     * @param array  $parameters
+     *
+     * @return RequestBuilder
+     */
+    public function uri($uri, array $parameters = [])
     {
         if ([] !== $parameters) {
             $search = [];
@@ -176,71 +279,122 @@ class RequestBuilder
         return $this;
     }
 
-    public function protocol(string $protocol): RequestBuilder
+    /**
+     * @param string $protocol
+     *
+     * @return RequestBuilder
+     */
+    public function protocol($protocol)
     {
         $this->protocol = $protocol;
 
         return $this;
     }
 
-    public function text(): RequestBuilder
+    /**
+     * @return RequestBuilder
+     */
+    public function text()
     {
         return $this->contentType('text/html');
     }
 
-    public function json(): RequestBuilder
+    /**
+     * @return RequestBuilder
+     */
+    public function json()
     {
         return $this->contentType('application/json');
     }
 
-    public function xml(): RequestBuilder
+    /**
+     * @return RequestBuilder
+     */
+    public function xml()
     {
         return $this->contentType('application/xml');
     }
 
-    public function encoded(): RequestBuilder
+    /**
+     * @return RequestBuilder
+     */
+    public function encoded()
     {
         return $this->contentType('application/x-www-form-urlencoded');
     }
 
-    public function formData(): RequestBuilder
+    /**
+     * @return RequestBuilder
+     */
+    public function formData()
     {
         return $this->contentType('multipart/form-data');
     }
 
-    public function encoding(string $encoding): RequestBuilder
+    /**
+     * @param string $encoding
+     *
+     * @return RequestBuilder
+     */
+    public function encoding($encoding)
     {
         return $this->curl(CURLOPT_ENCODING, $encoding);
     }
 
-    public function port(int $port): RequestBuilder
+    /**
+     * @param int $port
+     *
+     * @return RequestBuilder
+     */
+    public function port($port)
     {
         return $this->curl(CURLOPT_PORT, $port);
     }
 
-    public function nossl(): RequestBuilder
+    /**
+     * @return RequestBuilder
+     */
+    public function nossl()
     {
         return $this
             ->curl(CURLOPT_SSL_VERIFYPEER, false)
             ->curl(CURLOPT_SSL_VERIFYHOST, false);
     }
 
-    public function responseHeaders(bool $return = false): RequestBuilder
+    /**
+     * @param bool $return
+     *
+     * @return RequestBuilder
+     */
+    public function responseHeaders($return = false)
     {
         return $this->curl(CURLOPT_HEADER, $return);
     }
 
-    public function referer(string $referer): RequestBuilder
+    /**
+     * @param string $referer
+     *
+     * @return RequestBuilder
+     */
+    public function referer($referer)
     {
         return $this->curl(CURLOPT_REFERER, $referer);
     }
 
-    public function userAgent(string $userAgent): RequestBuilder
+    /**
+     * @param string $userAgent
+     *
+     * @return RequestBuilder
+     */
+    public function userAgent($userAgent)
     {
         return $this->curl(CURLOPT_USERAGENT, $userAgent);
     }
 
-    public function build(): CurlRequest
+    /**
+     * @return CurlRequest
+     */
+    public function build()
     {
         if (null === $this->method) {
             throw new \RuntimeException('Request must be defined with method');
@@ -286,7 +440,6 @@ class RequestBuilder
 
         $this->method = $this->uri = $this->body = null;
         $this->headers = $this->options = [];
-        $this->retries = 1;
         $this->protocol = '1.1';
 
         return new CurlRequest($request, $this->options);
