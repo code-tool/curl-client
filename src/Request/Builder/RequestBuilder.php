@@ -5,7 +5,6 @@ namespace Http\Client\Curl\Request\Builder;
 
 use Http\Client\Curl\Request\CurlRequest;
 use Http\Message\RequestFactory;
-use Psr\Http\Message\RequestInterface;
 
 class RequestBuilder
 {
@@ -241,7 +240,7 @@ class RequestBuilder
         return $this->curl(CURLOPT_USERAGENT, $userAgent);
     }
 
-    public function build(): RequestInterface
+    public function build(): CurlRequest
     {
         if (null === $this->method) {
             throw new \RuntimeException('Request must be defined with method');
