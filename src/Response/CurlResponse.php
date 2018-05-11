@@ -111,4 +111,14 @@ class CurlResponse implements ResponseInterface
     {
         return $this->curlInfo;
     }
+
+    public function toArray()
+    {
+        return [
+            'code' => $this->getStatusCode(),
+            'reason' => $this->getReasonPhrase(),
+            'headers' => $this->getHeaders(),
+            'body' => $this->getBody()->__toString(),
+        ];
+    }
 }

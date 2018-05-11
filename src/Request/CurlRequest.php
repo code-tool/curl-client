@@ -19,7 +19,7 @@ class CurlRequest implements RequestInterface
         $this->options = $options;
     }
 
-    public function options() : array
+    public function options(): array
     {
         return $this->options;
     }
@@ -131,5 +131,15 @@ class CurlRequest implements RequestInterface
         $copy->request = $this->request->withBody($body);
 
         return $copy;
+    }
+
+    public function toArray()
+    {
+        return [
+            'uri' => $this->getUri(),
+            'method' => $this->getMethod(),
+            'headers' => $this->getHeaders(),
+            'body' => $this->getBody(),
+        ];
     }
 }
