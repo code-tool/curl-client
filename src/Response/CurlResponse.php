@@ -1,6 +1,7 @@
 <?php
 namespace Http\Client\Curl\Response;
 
+use Http\Client\Curl\CurlInfo;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\StreamInterface;
 
@@ -10,7 +11,7 @@ class CurlResponse implements ResponseInterface
 
     private $curlInfo;
 
-    public function __construct(ResponseInterface $response, array $curlInfo)
+    public function __construct(ResponseInterface $response, CurlInfo $curlInfo)
     {
         $this->response = $response;
         $this->curlInfo = $curlInfo;
@@ -105,10 +106,20 @@ class CurlResponse implements ResponseInterface
     }
 
     /**
-     * @return array
+     * @return CurlInfo
      */
-    public function getCurlInfo()
+    public function curlInfo()
     {
         return $this->curlInfo;
+    }
+
+    public function toArray()
+    {
+        return [
+            'code' => $this->getStatusCode(),
+            'reason' => $this->getReasonPhrase(),
+            'headers' => $this->getHeaders(),
+            'body' => $this->getBody()->__toString(),
+        ];
     }
 }

@@ -1,6 +1,7 @@
 <?php
 namespace Http\Client\Curl\Channel;
 
+use Http\Client\Curl\CurlInfo;
 use Http\Client\Curl\Response\CurlResponse;
 use Http\Client\Exception\NetworkException;
 use Http\Client\Exception\RequestException;
@@ -92,7 +93,7 @@ class CurlChannel
         curl_exec($this->channel);
         switch (curl_errno($this->channel)) {
             case CURLE_OK:
-                return new CurlResponse($this->response, curl_getinfo($this->channel));
+                return new CurlResponse($this->response, new CurlInfo(curl_getinfo($this->channel)));
                 break;
             case CURLE_COULDNT_RESOLVE_PROXY:
             case CURLE_COULDNT_RESOLVE_HOST:
