@@ -110,9 +110,9 @@ class CurlInfo implements \ArrayAccess, \Countable, \IteratorAggregate
         return $this->get(self::CURL_REQUEST_SIZE);
     }
 
-    public function fileTime(): ?float
+    public function fileTime(): float
     {
-        return $this->get(self::CURL_FILE_TIME);
+        return (float)$this->get(self::CURL_FILE_TIME);
     }
 
     public function sslVerifyResult()
@@ -125,24 +125,24 @@ class CurlInfo implements \ArrayAccess, \Countable, \IteratorAggregate
         return $this->get(self::CURL_REDIRECT_COUNT);
     }
 
-    public function totalTime()
+    public function totalTime() : float
     {
-        return $this->get(self::CURL_TOTAL_TIME);
+        return (float)$this->get(self::CURL_TOTAL_TIME);
     }
 
-    public function namelookupTime(): ?float
+    public function namelookupTime(): float
     {
-        return $this->get(self::CURL_NAMELOOKUP_TIME);
+        return (float)$this->get(self::CURL_NAMELOOKUP_TIME);
     }
 
-    public function connectTime(): ?float
+    public function connectTime(): float
     {
-        return $this->get(self::CURL_CONNECT_TIME);
+        return (float)$this->get(self::CURL_CONNECT_TIME);
     }
 
-    public function pretranasferTime(): ?float
+    public function pretranasferTime(): float
     {
-        return $this->get(self::CURL_PRETRANSFER_TIME);
+        return (float)$this->get(self::CURL_PRETRANSFER_TIME);
     }
 
     public function sizeUpload()
@@ -175,14 +175,14 @@ class CurlInfo implements \ArrayAccess, \Countable, \IteratorAggregate
         return $this->get(self::CURL_UPLOAD_CONTENT_LENGTH);
     }
 
-    public function starttransferTime(): ?float
+    public function starttransferTime(): float
     {
         return (float)$this->get(self::CURL_STARTTRANSFER_TIME);
     }
 
-    public function redirectTime(): ?float
+    public function redirectTime(): float
     {
-        return $this->get(self::CURL_REDIRECT_TIME);
+        return (float)$this->get(self::CURL_REDIRECT_TIME);
     }
 
     public function redirectUrl(): ?string
@@ -190,9 +190,9 @@ class CurlInfo implements \ArrayAccess, \Countable, \IteratorAggregate
         return $this->get(self::CURL_REDIRECT_URL);
     }
 
-    public function primaryIp()
+    public function primaryIp(): string
     {
-        return $this->get(self::CURL_PRIMARY_IP);
+        return (string)$this->get(self::CURL_PRIMARY_IP);
     }
 
     public function certInfo()
@@ -200,9 +200,9 @@ class CurlInfo implements \ArrayAccess, \Countable, \IteratorAggregate
         return $this->get(self::CURL_CERTINFO);
     }
 
-    public function primaryPort()
+    public function primaryPort() : int
     {
-        return $this->get(self::CURL_PRIMARY_PORT);
+        return (int)$this->get(self::CURL_PRIMARY_PORT);
     }
 
     public function localIp()
