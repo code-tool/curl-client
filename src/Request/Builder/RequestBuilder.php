@@ -401,8 +401,11 @@ class RequestBuilder
 
         $matches = [];
         $uri = $this->uri;
-        preg_match_all('/\{([a-zA-Z0-9\-\_]+)\}/', $uri, $matches);
-        if (count($matches) > 1) {
+        $count = preg_match_all('/\{([a-zA-Z0-9\-\_]+)\}/', $uri, $matches);
+        if (false === $count) {
+            throw new \RuntimeException('Cannot check placeholders in uri %s', $uri);
+        }
+        if (0 !== $count) {
             $parameters = [];
             if ([] !== $this->parameters) {
                 $parameters = $this->parameters;
@@ -412,14 +415,16 @@ class RequestBuilder
             }
             if ([] === $parameters) {
                 throw new \LogicException(
-                    sprintf('Uri %s has placeholders but you didn\'t specify neither parameters nor body', $uri)
+                    sprintf('Uri %s has placeholders but you didn\'t specify neither parameters nor appropriate body', $uri)
                 );
             }
-            foreach ($matches[1] as $placeHolder) {
+            $search = [];
+            $replacement = [];
+            foreach (array_unique($matches[1]) as $placeHolder) {
                 if (false === array_key_exists($placeHolder, $parameters)) {
                     throw new \LogicException(
                         sprintf(
-                            'Uri %s has placeholder but neither parameters nor body have value for %s',
+                            'Uri %s has placeholder {%s} but neither parameters nor body have value for that',
                             $uri,
                             $placeHolder
                         )
