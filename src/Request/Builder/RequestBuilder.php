@@ -242,21 +242,38 @@ class RequestBuilder
             throw new \RuntimeException('Request must be defined with uri');
         }
 
-        $parameters = [];
-        if ([] !== $this->parameters) {
-            $parameters = $this->parameters;
-        }
-        if (is_array($this->body)) {
-            $parameters = array_merge($this->parameters, $this->body);
-        }
 
-        $search = [];
-        $replacement = [];
-        foreach ($parameters as $paramName => $paramValue) {
-            $search[] = sprintf('{%s}', $paramName);
-            $replacement[] = $paramValue;
+        $matches = [];
+        $uri = $this->uri;
+        preg_match('/\{([a-zA-Z0-9\-\_]+)\}/', $uri, $matches);
+        if (count($matches) > 1) {
+            $parameters = [];
+            if ([] !== $this->parameters) {
+                $parameters = $this->parameters;
+            }
+            if (is_array($this->body)) {
+                $parameters = array_merge($this->parameters, $this->body);
+            }
+            if ([] === $parameters) {
+                throw new \LogicException(
+                    sprintf('Uri %s has placeholders but you didn\'t specify neither parameters nor body', $uri)
+                );
+            }
+            foreach ($matches[1] as $placeHolder) {
+                if (false === array_key_exists($placeHolder, $parameters)) {
+                    throw new \LogicException(
+                        sprintf(
+                            'Uri %s has placeholder but neither parameters nor body have value for %s',
+                            $uri,
+                            $placeHolder
+                        )
+                    );
+                }
+                $search[] = sprintf('{%s}', $placeHolder);
+                $replacement[] = $parameters[$placeHolder];
+            }
+            $uri = str_replace($search, $replacement, $uri);
         }
-        $uri = str_replace($search, $replacement, $this->uri);
 
         $body = $this->body;
         switch (strtoupper($this->method)) {
