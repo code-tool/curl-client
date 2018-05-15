@@ -398,6 +398,7 @@ class RequestBuilder
             throw new \RuntimeException('Request must be defined with uri');
         }
 
+        $parameters = [];
         if ([] !== $this->parameters) {
             $parameters = $this->parameters;
         }
