@@ -245,7 +245,7 @@ class RequestBuilder
 
         $matches = [];
         $uri = $this->uri;
-        preg_match('/\{([a-zA-Z0-9\-\_]+)\}/', $uri, $matches);
+        preg_match_all('/\{([a-zA-Z0-9\-\_]+)\}/', $uri, $matches);
         if (count($matches) > 1) {
             $parameters = [];
             if ([] !== $this->parameters) {
