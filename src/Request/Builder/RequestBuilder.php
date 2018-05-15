@@ -14,6 +14,8 @@ class RequestBuilder
 
     private $body;
 
+    private $parameters;
+
     private $headers = [];
 
     private $options = [];
@@ -265,16 +267,8 @@ class RequestBuilder
      */
     public function uri($uri, array $parameters = [])
     {
-        if ([] !== $parameters) {
-            $search = [];
-            $replacement = [];
-            foreach ($parameters as $paramName => $paramValue) {
-                $search[] = sprintf('{%s}', $paramName);
-                $replacement[] = $paramValue;
-            }
-            $uri = str_replace($search, $replacement, $uri);
-        }
         $this->uri = $uri;
+        $this->parameters = $parameters;
 
         return $this;
     }
@@ -404,6 +398,22 @@ class RequestBuilder
             throw new \RuntimeException('Request must be defined with uri');
         }
 
+        if ([] !== $this->parameters) {
+            $parameters = $this->parameters;
+        }
+        if (is_array($this->body)) {
+            $parameters = array_merge($this->parameters, $this->body);
+        }
+
+        $search = [];
+        $replacement = [];
+        foreach ($parameters as $paramName => $paramValue) {
+            $search[] = sprintf('{%s}', $paramName);
+            $replacement[] = $paramValue;
+        }
+        $uri = str_replace($search, $replacement, $this->uri);
+
+        $body = $this->body;
         switch (strtoupper($this->method)) {
             case 'POST':
             case 'PUT':
@@ -413,33 +423,33 @@ class RequestBuilder
                 }
                 switch ($this->headers['Content-Type']) {
                     case 'application/json':
-                        $this->body = json_encode($this->body);
+                        $body = json_encode($body);
                         break;
                     case 'application/x-www-form-urlencoded':
-                        $this->body = http_build_query($this->body);
+                        $body = http_build_query($body);
                         break;
                     default:
                         break;
                 }
                 break;
             default:
-                if (null !== $this->body) {
-                    $this->uri .= '?' . http_build_query($this->body);
-                    $this->body = null;
+                if (null !== $body) {
+                    $uri .= '?' . http_build_query($body);
+                    $body = null;
                 }
         }
 
         $request = $this->requestFactory
             ->createRequest(
                 $this->method,
-                $this->uri,
+                $uri,
                 $this->headers,
-                $this->body,
+                $body,
                 $this->protocol
             );
 
         $this->method = $this->uri = $this->body = null;
-        $this->headers = $this->options = [];
+        $this->parameters = $this->headers = $this->options = [];
         $this->protocol = '1.1';
 
         return new CurlRequest($request, $this->options);
