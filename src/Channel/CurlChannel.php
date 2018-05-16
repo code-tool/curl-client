@@ -2,9 +2,10 @@
 namespace Http\Client\Curl\Channel;
 
 use Http\Client\Curl\CurlInfo;
+use Http\Client\Curl\Exception\ResolveException;
 use Http\Client\Curl\Response\CurlResponse;
-use Http\Client\Exception\NetworkException;
 use Http\Client\Exception\RequestException;
+use MongoDB\Driver\Exception\ConnectionException;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 
@@ -97,10 +98,11 @@ class CurlChannel
                 break;
             case CURLE_COULDNT_RESOLVE_PROXY:
             case CURLE_COULDNT_RESOLVE_HOST:
+                throw new ResolveException(curl_error($this->channel), $this->request);
             case CURLE_COULDNT_CONNECT:
             case CURLE_OPERATION_TIMEOUTED:
             case CURLE_SSL_CONNECT_ERROR:
-                throw new NetworkException(curl_error($this->channel), $this->request);
+                throw new ConnectionException(curl_error($this->channel), $this->request);
             default:
                 throw new RequestException(curl_error($this->channel), $this->request);
         }
