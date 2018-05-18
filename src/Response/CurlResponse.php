@@ -115,10 +115,15 @@ class CurlResponse implements ResponseInterface
 
     public function toArray()
     {
+        $headers = [];
+        foreach ($this->getHeaders() as $header => $values) {
+            $headers[$header] = implode('; ', $values);
+        }
+
         return [
             'code' => $this->getStatusCode(),
             'reason' => $this->getReasonPhrase(),
-            'headers' => $this->getHeaders(),
+            'headers' => $headers,
             'body' => $this->getBody()->__toString(),
         ];
     }

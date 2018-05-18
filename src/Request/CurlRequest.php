@@ -136,11 +136,17 @@ class CurlRequest implements RequestInterface
 
     public function toArray()
     {
+        $headers = [];
+        foreach ($this->getHeaders() as $header => $values) {
+            $headers[$header] = implode('; ', $values);
+        }
+
         return [
-            'uri' => $this->getUri(),
+            'host' => $this->getUri()->getHost(),
             'method' => $this->getMethod(),
-            'headers' => $this->getHeaders(),
-            'body' => $this->getBody(),
+            'uri' => $this->getUri()->getPath(),
+            'headers' => $headers,
+            'body' => $this->getBody()->__toString(),
         ];
     }
 }
