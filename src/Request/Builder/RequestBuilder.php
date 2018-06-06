@@ -224,12 +224,12 @@ class RequestBuilder
 
     public function referer(string $referer): RequestBuilder
     {
-        return $this->curl(CURLOPT_REFERER, $referer);
+        return $this->header('Referer', $referer);
     }
 
     public function userAgent(string $userAgent): RequestBuilder
     {
-        return $this->curl(CURLOPT_USERAGENT, $userAgent);
+        return $this->header('User-Agent', $userAgent);
     }
 
     public function build(): CurlRequest
