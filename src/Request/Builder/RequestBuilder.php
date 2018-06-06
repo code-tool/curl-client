@@ -372,7 +372,7 @@ class RequestBuilder
      */
     public function referer($referer)
     {
-        return $this->curl(CURLOPT_REFERER, $referer);
+        return $this->header('Referer', $referer);
     }
 
     /**
@@ -382,7 +382,7 @@ class RequestBuilder
      */
     public function userAgent($userAgent)
     {
-        return $this->curl(CURLOPT_USERAGENT, $userAgent);
+        return $this->header('User-Agent', $userAgent);
     }
 
     /**
