@@ -9,12 +9,42 @@ class CurlRequest implements RequestInterface
 {
     private $request;
 
+    private $connectMs;
+
+    private $timeoutMs;
+
+    private $ssl;
+
+    private $authType;
+
+    private $returnHeaders;
+
     private $options;
 
-    public function __construct(RequestInterface $request, array $options)
-    {
+    public function __construct(
+        RequestInterface $request,
+        $connectMs,
+        $timeoutMs,
+        $ssl,
+        $authType,
+        $returnHeaders,
+        array $options
+    ) {
         $this->request = $request;
+        $this->connectMs = $connectMs;
+        $this->timeoutMs = $timeoutMs;
+        $this->ssl = $ssl;
+        $this->authType = $authType;
+        $this->returnHeaders = $returnHeaders;
         $this->options = $options;
+    }
+
+    /**
+     * @return bool
+     */
+    public function ssl()
+    {
+        return $this->ssl;
     }
 
     /**
@@ -22,7 +52,29 @@ class CurlRequest implements RequestInterface
      */
     public function options()
     {
-        return $this->options;
+        $options = $this->options;
+        if (false === $this->ssl) {
+            $options[CURLOPT_SSL_VERIFYPEER] = false;
+            $options[CURLOPT_SSL_VERIFYHOST] = false;
+        }
+
+        if ('' !== $this->authType) {
+            $options[CURLOPT_HTTPAUTH] = $this->authType;
+        }
+
+        if (0 !== $this->connectMs) {
+            $options[CURLOPT_CONNECTTIMEOUT_MS] = $this->connectMs;
+        }
+
+        if (0 !== $this->timeoutMs) {
+            $options[CURLOPT_TIMEOUT_MS] = $this->timeoutMs;
+        }
+
+        if ($this->returnHeaders) {
+            $options[CURLOPT_HEADER] = true;
+        }
+
+        return $options;
     }
 
     public function getRequestTarget()

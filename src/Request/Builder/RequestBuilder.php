@@ -3,12 +3,25 @@ namespace Http\Client\Curl\Request\Builder;
 
 use Http\Client\Curl\Request\CurlRequest;
 use Http\Message\RequestFactory;
+use Http\Message\UriFactory;
 
 class RequestBuilder
 {
+    private $uriFactory;
+
     private $requestFactory;
 
     private $method;
+
+    private $user;
+
+    private $password;
+
+    private $scheme;
+
+    private $host;
+
+    private $port;
 
     private $uri;
 
@@ -20,28 +33,34 @@ class RequestBuilder
 
     private $options = [];
 
+    private $authType = '';
+
+    private $ssl = true;
+
+    private $returnHeaders = false;
+
+    private $timeoutMs = 0;
+
+    private $connectMs = 0;
+
     private $protocol = '1.1';
 
-    public function __construct(RequestFactory $requestFactory)
+    public function __construct(UriFactory $uriFactory, RequestFactory $requestFactory)
     {
+        $this->uriFactory = $uriFactory;
         $this->requestFactory = $requestFactory;
     }
 
     /**
      * @param string $username
      * @param string $password
-     * @param string $type
+     * @param string $authType
      *
      * @return RequestBuilder
      */
-    public function auth($username, $password, $type = '')
+    public function auth($username, $password, $authType = '')
     {
-        $this->curl(CURLOPT_USERPWD, sprintf('%s:%s', $username, $password));
-        if ('' !== $type) {
-            $this->curl(CURLOPT_HTTPAUTH, $type);
-        }
-
-        return $this;
+        return $this->authType($authType)->user($username, $password);
     }
 
     /**
@@ -52,7 +71,10 @@ class RequestBuilder
      */
     public function user($username, $password)
     {
-        return $this->curl(CURLOPT_USERPWD, sprintf('%s:%s', $username, $password));
+        $this->user = $username;
+        $this->password = $password;
+
+        return $this;
     }
 
     /**
@@ -62,7 +84,9 @@ class RequestBuilder
      */
     public function authType($authType)
     {
-        return $this->curl(CURLOPT_HTTPAUTH, $authType);
+        $this->authType = $authType;
+
+        return $this;
     }
 
     /**
@@ -162,7 +186,7 @@ class RequestBuilder
      */
     public function timeoutMs($msec)
     {
-        $this->options[CURLOPT_TIMEOUT_MS] = $msec;
+        $this->timeoutMs = $msec;
 
         return $this;
     }
@@ -184,7 +208,7 @@ class RequestBuilder
      */
     public function connectMs($msec)
     {
-        $this->options[CURLOPT_CONNECTTIMEOUT_MS] = $msec;
+        $this->connectMs = $msec;
 
         return $this;
     }
@@ -209,7 +233,7 @@ class RequestBuilder
      */
     public function headers(array $headers)
     {
-        $this->headers = $headers;
+        $this->headers = array_replace($this->headers, $headers);
 
         return $this;
     }
@@ -254,7 +278,7 @@ class RequestBuilder
      */
     public function curls(array $options)
     {
-        $this->options = $options;
+        $this->options = array_replace($this->options, $options);
 
         return $this;
     }
@@ -267,7 +291,7 @@ class RequestBuilder
      */
     public function uri($uri, array $parameters = [])
     {
-        $this->uri = $uri;
+        $this->uri = ltrim($uri, '/');
         $this->parameters = $parameters;
 
         return $this;
@@ -332,7 +356,36 @@ class RequestBuilder
      */
     public function encoding($encoding)
     {
-        return $this->curl(CURLOPT_ENCODING, $encoding);
+        return $this->header('Content-Encoding', $encoding);
+    }
+
+    /**
+     * @param string $host
+     *
+     * @return RequestBuilder
+     */
+    public function host($host)
+    {
+        $matches = [];
+        $count = preg_match(
+            '/^(?<scheme>(http|https))?(?<separator>\:\/\/)?(?<host>[a-zA-Z\d\.\-\/]+):?(?<port>\d+)?\/*$/',
+            $host,
+            $matches
+        );
+        if (0 === $count) {
+            $this->host = rtrim($host, '/');
+
+            return $this;
+        }
+        $this->host = $matches['host'];
+        if (array_key_exists('scheme', $matches) && '' !== $matches['scheme']) {
+            $this->scheme = (string)$matches['scheme'];
+        }
+        if (array_key_exists('port', $matches) && '' !== $matches['port']) {
+            $this->port = (int)$matches['port'];
+        }
+
+        return $this;
     }
 
     /**
@@ -342,7 +395,9 @@ class RequestBuilder
      */
     public function port($port)
     {
-        return $this->curl(CURLOPT_PORT, $port);
+        $this->port = $port;
+
+        return $this;
     }
 
     /**
@@ -350,9 +405,9 @@ class RequestBuilder
      */
     public function nossl()
     {
-        return $this
-            ->curl(CURLOPT_SSL_VERIFYPEER, false)
-            ->curl(CURLOPT_SSL_VERIFYHOST, false);
+        $this->ssl = false;
+
+        return $this;
     }
 
     /**
@@ -362,7 +417,9 @@ class RequestBuilder
      */
     public function responseHeaders($return = false)
     {
-        return $this->curl(CURLOPT_HEADER, $return);
+        $this->returnHeaders = $return;
+
+        return $this;
     }
 
     /**
@@ -386,6 +443,21 @@ class RequestBuilder
     }
 
     /**
+     *
+     */
+    public function clean()
+    {
+        $this->method = $this->user = $this->password = $this->scheme =
+        $this->host = $this->port = $this->uri = $this->body = null;
+        $this->parameters = $this->headers = $this->options = [];
+        $this->authType = '';
+        $this->ssl = true;
+        $this->returnHeaders = false;
+        $this->connectMs = $this->timeoutMs = 0;
+        $this->protocol = '1.1';
+    }
+
+    /**
      * @return CurlRequest
      */
     public function build()
@@ -398,12 +470,11 @@ class RequestBuilder
             throw new \RuntimeException('Request must be defined with uri');
         }
 
-
         $matches = [];
-        $uri = $this->uri;
-        $count = preg_match_all('/\{([a-zA-Z0-9\-\_]+)\}/', $uri, $matches);
+        $url = $this->uri;
+        $count = preg_match_all('/\{([a-zA-Z0-9\-\_]+)\}/', $url, $matches);
         if (false === $count) {
-            throw new \RuntimeException('Cannot check placeholders in uri %s', $uri);
+            throw new \RuntimeException('Cannot check placeholders in uri %s', $url);
         }
         if (0 !== $count) {
             $parameters = [];
@@ -415,7 +486,10 @@ class RequestBuilder
             }
             if ([] === $parameters) {
                 throw new \LogicException(
-                    sprintf('Uri %s has placeholders but you didn\'t specify neither parameters nor appropriate body', $uri)
+                    sprintf(
+                        'Uri %s has placeholders but you didn\'t specify neither parameters nor appropriate body',
+                        $url
+                    )
                 );
             }
             $search = [];
@@ -425,7 +499,7 @@ class RequestBuilder
                     throw new \LogicException(
                         sprintf(
                             'Uri %s has placeholder {%s} but neither parameters nor body have value for that',
-                            $uri,
+                            $url,
                             $placeHolder
                         )
                     );
@@ -433,9 +507,8 @@ class RequestBuilder
                 $search[] = sprintf('{%s}', $placeHolder);
                 $replacement[] = $parameters[$placeHolder];
             }
-            $uri = str_replace($search, $replacement, $uri);
+            $url = str_replace($search, $replacement, $url);
         }
-
         $body = $this->body;
         switch (strtoupper($this->method)) {
             case 'POST':
@@ -457,11 +530,22 @@ class RequestBuilder
                 break;
             default:
                 if (null !== $body) {
-                    $uri .= '?' . http_build_query($body);
+                    $url .= '?' . http_build_query($body);
                     $body = null;
                 }
         }
-
+        $uri = '';
+        if ($this->scheme) {
+            $uri .= $this->scheme . '://';
+        }
+        if ($this->user) {
+            $uri .= $this->user . ($this->password ? ':' . $this->password : '') . '@';
+        }
+        $uri .= $this->host;
+        if (null !== $this->port) {
+            $uri .= ':' . $this->port;
+        }
+        $uri .= '/' . $url;
         $request = $this->requestFactory
             ->createRequest(
                 $this->method,
@@ -471,10 +555,17 @@ class RequestBuilder
                 $this->protocol
             );
 
-        $this->method = $this->uri = $this->body = null;
-        $this->parameters = $this->headers = $this->options = [];
-        $this->protocol = '1.1';
+        $request = new CurlRequest(
+            $request,
+            $this->connectMs,
+            $this->timeoutMs,
+            $this->ssl,
+            $this->authType,
+            $this->returnHeaders,
+            $this->options
+        );
+        $this->clean();
 
-        return new CurlRequest($request, $this->options);
+        return $request;
     }
 }
