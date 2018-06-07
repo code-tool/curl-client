@@ -5,12 +5,25 @@ namespace Http\Client\Curl\Request\Builder;
 
 use Http\Client\Curl\Request\CurlRequest;
 use Http\Message\RequestFactory;
+use Http\Message\UriFactory;
 
 class RequestBuilder
 {
+    private $uriFactory;
+
     private $requestFactory;
 
     private $method;
+
+    private $user;
+
+    private $password;
+
+    private $scheme;
+
+    private $host;
+
+    private $port;
 
     private $uri;
 
@@ -22,31 +35,42 @@ class RequestBuilder
 
     private $options = [];
 
+    private $authType = '';
+
+    private $ssl = true;
+
+    private $returnHeaders = false;
+
+    private $timeoutMs = 0;
+
+    private $connectMs = 0;
+
     private $protocol = '1.1';
 
-    public function __construct(RequestFactory $requestFactory)
+    public function __construct(UriFactory $uriFactory, RequestFactory $requestFactory)
     {
+        $this->uriFactory = $uriFactory;
         $this->requestFactory = $requestFactory;
     }
 
-    public function auth(string $username, string $password, string $type = ''): RequestBuilder
+    public function auth(string $username, string $password, string $authType = ''): RequestBuilder
     {
-        $this->curl(CURLOPT_USERPWD, sprintf('%s:%s', $username, $password));
-        if ('' !== $type) {
-            $this->curl(CURLOPT_HTTPAUTH, $type);
-        }
-
-        return $this;
+        return $this->authType($authType)->user($username, $password);
     }
 
     public function user(string $username, string $password): RequestBuilder
     {
-        return $this->curl(CURLOPT_USERPWD, sprintf('%s:%s', $username, $password));
+        $this->user = $username;
+        $this->password = $password;
+
+        return $this;
     }
 
     public function authType(string $authType): RequestBuilder
     {
-        return $this->curl(CURLOPT_HTTPAUTH, $authType);
+        $this->authType = $authType;
+
+        return $this;
     }
 
     public function method(string $method): RequestBuilder
@@ -105,7 +129,7 @@ class RequestBuilder
 
     public function timeoutMs(int $msec): RequestBuilder
     {
-        $this->options[CURLOPT_TIMEOUT_MS] = $msec;
+        $this->timeoutMs = $msec;
 
         return $this;
     }
@@ -117,7 +141,7 @@ class RequestBuilder
 
     public function connectMs(int $msec): RequestBuilder
     {
-        $this->options[CURLOPT_CONNECTTIMEOUT_MS] = $msec;
+        $this->connectMs = $msec;
 
         return $this;
     }
@@ -131,7 +155,7 @@ class RequestBuilder
 
     public function headers(array $headers): RequestBuilder
     {
-        $this->headers = $headers;
+        $this->headers = array_replace($this->headers, $headers);
 
         return $this;
     }
@@ -155,7 +179,7 @@ class RequestBuilder
 
     public function curls(array $options): RequestBuilder
     {
-        $this->options = $options;
+        $this->options = array_replace($this->options, $options);
 
         return $this;
     }
@@ -202,24 +226,42 @@ class RequestBuilder
 
     public function encoding(string $encoding): RequestBuilder
     {
-        return $this->curl(CURLOPT_ENCODING, $encoding);
+        return $this->header('Content-Encoding', $encoding);
+    }
+
+    public function host(string $host): RequestBuilder
+    {
+        $count = preg_match('/^(http|https)://(.*)/$', $host, $matches);
+        if (0 === $count) {
+            $this->host = $host;
+
+            return $this;
+        }
+        $this->scheme = $matches[1];
+        $this->host = $matches[2];
+
+        return $this;
     }
 
     public function port(int $port): RequestBuilder
     {
-        return $this->curl(CURLOPT_PORT, $port);
+        $this->port = $port;
+
+        return $this;
     }
 
     public function nossl(): RequestBuilder
     {
-        return $this
-            ->curl(CURLOPT_SSL_VERIFYPEER, false)
-            ->curl(CURLOPT_SSL_VERIFYHOST, false);
+        $this->ssl = false;
+
+        return $this;
     }
 
     public function responseHeaders(bool $return = false): RequestBuilder
     {
-        return $this->curl(CURLOPT_HEADER, $return);
+        $this->returnHeaders = $return;
+
+        return $this;
     }
 
     public function referer(string $referer): RequestBuilder
@@ -232,6 +274,18 @@ class RequestBuilder
         return $this->header('User-Agent', $userAgent);
     }
 
+    public function clean()
+    {
+        $this->method = $this->user = $this->password = $this->scheme =
+        $this->host = $this->port = $this->uri = $this->body = null;
+        $this->parameters = $this->headers = $this->options = [];
+        $this->authType = '';
+        $this->ssl = true;
+        $this->returnHeaders = false;
+        $this->connectMs = $this->timeoutMs = 0;
+        $this->protocol = '1.1';
+    }
+
     public function build(): CurlRequest
     {
         if (null === $this->method) {
@@ -242,12 +296,11 @@ class RequestBuilder
             throw new \RuntimeException('Request must be defined with uri');
         }
 
-
         $matches = [];
-        $uri = $this->uri;
-        $count = preg_match_all('/\{([a-zA-Z0-9\-\_]+)\}/', $uri, $matches);
+        $url = $this->uri;
+        $count = preg_match_all('/\{([a-zA-Z0-9\-\_]+)\}/', $url, $matches);
         if (false === $count) {
-            throw new \RuntimeException('Cannot check placeholders in uri %s', $uri);
+            throw new \RuntimeException('Cannot check placeholders in uri %s', $url);
         }
         if (0 !== $count) {
             $parameters = [];
@@ -259,7 +312,10 @@ class RequestBuilder
             }
             if ([] === $parameters) {
                 throw new \LogicException(
-                    sprintf('Uri %s has placeholders but you didn\'t specify neither parameters nor appropriate body', $uri)
+                    sprintf(
+                        'Uri %s has placeholders but you didn\'t specify neither parameters nor appropriate body',
+                        $url
+                    )
                 );
             }
             $search = [];
@@ -269,7 +325,7 @@ class RequestBuilder
                     throw new \LogicException(
                         sprintf(
                             'Uri %s has placeholder {%s} but neither parameters nor body have value for that',
-                            $uri,
+                            $url,
                             $placeHolder
                         )
                     );
@@ -277,9 +333,8 @@ class RequestBuilder
                 $search[] = sprintf('{%s}', $placeHolder);
                 $replacement[] = $parameters[$placeHolder];
             }
-            $uri = str_replace($search, $replacement, $uri);
+            $url = str_replace($search, $replacement, $url);
         }
-
         $body = $this->body;
         switch (strtoupper($this->method)) {
             case 'POST':
@@ -301,11 +356,22 @@ class RequestBuilder
                 break;
             default:
                 if (null !== $body) {
-                    $uri .= '?' . http_build_query($body);
+                    $url .= '?' . http_build_query($body);
                     $body = null;
                 }
         }
-
+        $uri = '';
+        if ($this->scheme) {
+            $uri .= $this->scheme . '://';
+        }
+        if ($this->user) {
+            $uri .= $this->user . ($this->password ? ':' . $this->password : '') . '@';
+        }
+        $uri .= $this->host;
+        if (null !== $this->port) {
+            $uri .= ':' . $this->port;
+        }
+        $uri .= $url;
         $request = $this->requestFactory
             ->createRequest(
                 $this->method,
@@ -315,10 +381,17 @@ class RequestBuilder
                 $this->protocol
             );
 
-        $this->method = $this->uri = $this->body = null;
-        $this->parameters = $this->headers = $this->options = [];
-        $this->protocol = '1.1';
+        $request = new CurlRequest(
+            $request,
+            $this->connectMs,
+            $this->timeoutMs,
+            $this->ssl,
+            $this->authType,
+            $this->returnHeaders,
+            $this->options
+        );
+        $this->clean();
 
-        return new CurlRequest($request, $this->options);
+        return $request;
     }
 }

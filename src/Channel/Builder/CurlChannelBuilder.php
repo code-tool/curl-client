@@ -149,6 +149,13 @@ class CurlChannelBuilder
         return $this;
     }
 
+    public function setPort(): CurlChannelBuilder
+    {
+        $this->options[CURLOPT_PORT] = $this->request->getUri()->getPort();
+
+        return $this;
+    }
+
     public function setMethod(): CurlChannelBuilder
     {
         switch (strtoupper($this->request->getMethod())) {
@@ -203,6 +210,7 @@ class CurlChannelBuilder
             ->setMethod()
             ->setBodySize()
             ->setHttpVersion()
+            ->setPort()
             ->setUrl()
             ->setHeaders()
             ->setUserInfo()
