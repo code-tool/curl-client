@@ -186,7 +186,7 @@ class RequestBuilder
 
     public function uri(string $uri, array $parameters = []): RequestBuilder
     {
-        $this->uri = $uri;
+        $this->uri = ltrim($uri, '/');
         $this->parameters = $parameters;
 
         return $this;
@@ -231,14 +231,24 @@ class RequestBuilder
 
     public function host(string $host): RequestBuilder
     {
-        $count = preg_match('/^(http|https)://(.*)/$', $host, $matches);
+        $matches = [];
+        $count = preg_match(
+            '/^(?<scheme>(http|https))?(?<separator>\:\/\/)?(?<host>[a-zA-Z\d\.\-\/]+):?(?<port>\d+)?\/*$/',
+            $host,
+            $matches
+        );
         if (0 === $count) {
-            $this->host = $host;
+            $this->host = rtrim($host, '/');
 
             return $this;
         }
-        $this->scheme = $matches[1];
-        $this->host = $matches[2];
+        $this->host = $matches['host'];
+        if (array_key_exists('scheme', $matches) && '' !== $matches['scheme']) {
+            $this->scheme = (string)$matches['scheme'];
+        }
+        if (array_key_exists('port', $matches) && '' !== $matches['port']) {
+            $this->port = (int)$matches['port'];
+        }
 
         return $this;
     }
@@ -371,7 +381,7 @@ class RequestBuilder
         if (null !== $this->port) {
             $uri .= ':' . $this->port;
         }
-        $uri .= $url;
+        $uri .= '/' . $url;
         $request = $this->requestFactory
             ->createRequest(
                 $this->method,
