@@ -37,6 +37,8 @@ class RequestBuilder
 
     private $ssl = true;
 
+    private $noProcess = false;
+
     private $returnHeaders = false;
 
     private $timeoutMs = 0;
@@ -328,6 +330,16 @@ class RequestBuilder
     /**
      * @return RequestBuilder
      */
+    public function noprocess()
+    {
+        $this->noProcess = true;
+
+        return $this;
+    }
+
+    /**
+     * @return RequestBuilder
+     */
     public function xml()
     {
         return $this->contentType('application/xml');
@@ -452,7 +464,7 @@ class RequestBuilder
         $this->parameters = $this->headers = $this->options = [];
         $this->authType = '';
         $this->ssl = true;
-        $this->returnHeaders = false;
+        $this->returnHeaders = $this->noProcess = false;
         $this->connectMs = $this->timeoutMs = 0;
         $this->protocol = '1.1';
     }
@@ -515,6 +527,9 @@ class RequestBuilder
             case 'PUT':
             case 'PATCH':
                 if (false === array_key_exists('Content-Type', $this->headers)) {
+                    break;
+                }
+                if ($this->noProcess) {
                     break;
                 }
                 switch ($this->headers['Content-Type']) {
