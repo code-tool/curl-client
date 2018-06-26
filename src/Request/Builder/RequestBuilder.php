@@ -326,7 +326,6 @@ class RequestBuilder
     {
         return $this->contentType('application/json');
     }
-
     /**
      * @return RequestBuilder
      */
@@ -336,7 +335,6 @@ class RequestBuilder
 
         return $this;
     }
-
     /**
      * @return RequestBuilder
      */
