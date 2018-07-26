@@ -5,7 +5,7 @@ use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\StreamInterface;
 use Psr\Http\Message\UriInterface;
 
-class CurlRequest implements RequestInterface
+class CurlRequest implements RequestInterface, \JsonSerializable
 {
     private $request;
 
@@ -200,5 +200,10 @@ class CurlRequest implements RequestInterface
             'headers' => $headers,
             'body' => $this->getBody()->__toString(),
         ];
+    }
+
+    public function jsonSerialize()
+    {
+        return $this->toArray();
     }
 }

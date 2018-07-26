@@ -5,7 +5,7 @@ use Http\Client\Curl\CurlInfo;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\StreamInterface;
 
-class CurlResponse implements ResponseInterface
+class CurlResponse implements ResponseInterface, \JsonSerializable
 {
     private $response;
 
@@ -126,5 +126,10 @@ class CurlResponse implements ResponseInterface
             'headers' => $headers,
             'body' => $this->getBody()->__toString(),
         ];
+    }
+
+    public function jsonSerialize()
+    {
+        return $this->toArray();
     }
 }
