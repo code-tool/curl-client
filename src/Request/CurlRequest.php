@@ -194,7 +194,9 @@ class CurlRequest implements RequestInterface, \JsonSerializable
             'method' => $this->getMethod(),
             'uri' => $this->getUri()->getPath(),
             'headers' => $headers,
-            'body' => $this->getBody()->__toString(),
+            'body' => method_exists($this->request, 'getParsedBody')
+                ? $this->request->getParsedBody()
+                : $this->getBody()->__toString(),
         ];
     }
 
