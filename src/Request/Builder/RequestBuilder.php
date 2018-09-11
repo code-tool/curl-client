@@ -370,9 +370,11 @@ class RequestBuilder
                         $body = json_encode($body);
 
                         if (JSON_ERROR_NONE !== json_last_error()) {
-                            throw new \RuntimeException(
-                                sprintf('Failed to json_encode body. Error: %s', json_last_error_msg())
-                            );
+                            $message = json_last_error_msg();
+
+                            json_encode(null);
+
+                            throw new \RuntimeException(sprintf('Failed to json_encode body. Error: %s', $message));
                         }
 
                         break;
