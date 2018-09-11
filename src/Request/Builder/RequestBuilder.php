@@ -1,5 +1,5 @@
 <?php
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace Http\Client\Curl\Request\Builder;
 
@@ -126,7 +126,7 @@ class RequestBuilder
 
     public function timeout(float $sec): RequestBuilder
     {
-        return $this->timeoutMs((int)($sec * 1000));
+        return $this->timeoutMs((int) ($sec * 1000));
     }
 
     public function timeoutMs(int $msec): RequestBuilder
@@ -138,7 +138,7 @@ class RequestBuilder
 
     public function connect(float $sec): RequestBuilder
     {
-        return $this->connectMs((int)($sec * 1000));
+        return $this->connectMs((int) ($sec * 1000));
     }
 
     public function connectMs(int $msec): RequestBuilder
@@ -211,14 +211,14 @@ class RequestBuilder
         return $this->contentType('application/json');
     }
 
-    public function noprocess() : RequestBuilder
+    public function noprocess(): RequestBuilder
     {
         $this->noProcess = true;
 
         return $this;
     }
 
-    public function xml() : RequestBuilder
+    public function xml(): RequestBuilder
     {
         return $this->contentType('application/xml');
     }
@@ -253,10 +253,10 @@ class RequestBuilder
         }
         $this->host = $matches['host'];
         if (array_key_exists('scheme', $matches) && '' !== $matches['scheme']) {
-            $this->scheme = (string)$matches['scheme'];
+            $this->scheme = (string) $matches['scheme'];
         }
         if (array_key_exists('port', $matches) && '' !== $matches['port']) {
-            $this->port = (int)$matches['port'];
+            $this->port = (int) $matches['port'];
         }
 
         return $this;
@@ -319,14 +319,14 @@ class RequestBuilder
         $url = $this->uri;
         $count = preg_match_all('/\{([a-zA-Z0-9\-\_]+)\}/', $url, $matches);
         if (false === $count) {
-            throw new \RuntimeException('Cannot check placeholders in uri %s', $url);
+            throw new \RuntimeException(sprintf('Cannot check placeholders in uri %s', $url));
         }
         if (0 !== $count) {
             $parameters = [];
             if ([] !== $this->parameters) {
                 $parameters = $this->parameters;
             }
-            if (is_array($this->body)) {
+            if (\is_array($this->body)) {
                 $parameters = array_merge($this->parameters, $this->body);
             }
             if ([] === $parameters) {
