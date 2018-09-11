@@ -368,6 +368,13 @@ class RequestBuilder
                 switch ($this->headers['Content-Type']) {
                     case 'application/json':
                         $body = json_encode($body);
+
+                        if (JSON_ERROR_NONE !== json_last_error()) {
+                            throw new \RuntimeException(
+                                sprintf('Failed to json_encode body. Error: %s', json_last_error_msg())
+                            );
+                        }
+
                         break;
                     case 'application/x-www-form-urlencoded':
                         $body = http_build_query($body);
