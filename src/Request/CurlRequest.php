@@ -58,7 +58,7 @@ class CurlRequest implements RequestInterface, \JsonSerializable
             $options[CURLOPT_SSL_VERIFYHOST] = false;
         }
 
-        if ('' !== $this->authType) {
+        if (0 !== $this->authType) {
             $options[CURLOPT_HTTPAUTH] = $this->authType;
         }
 
@@ -198,7 +198,9 @@ class CurlRequest implements RequestInterface, \JsonSerializable
             'method' => $this->getMethod(),
             'uri' => $this->getUri()->getPath(),
             'headers' => $headers,
-            'body' => $this->getBody()->__toString(),
+            'body' => method_exists($this->request, 'getParsedBody')
+                ? $this->request->getParsedBody()
+                : $this->getBody()->__toString(),
         ];
     }
 
