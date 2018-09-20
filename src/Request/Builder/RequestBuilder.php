@@ -64,7 +64,7 @@ class RequestBuilder
      *
      * @return RequestBuilder
      */
-    public function auth($username, $password, $authType = 0): RequestBuilder
+    public function auth($username, $password, $authType = 0)
     {
         return $this->authType($authType)->user($username, $password);
     }
