@@ -28,7 +28,7 @@ class CurlRequest implements RequestInterface, \JsonSerializable
         int $connectMs,
         int $timeoutMs,
         bool $ssl,
-        string $authType,
+        int $authType,
         bool $returnHeaders,
         array $options
     ) {
@@ -54,7 +54,7 @@ class CurlRequest implements RequestInterface, \JsonSerializable
             $options[CURLOPT_SSL_VERIFYHOST] = false;
         }
 
-        if ('' !== $this->authType) {
+        if (0 !== $this->authType) {
             $options[CURLOPT_HTTPAUTH] = $this->authType;
         }
 

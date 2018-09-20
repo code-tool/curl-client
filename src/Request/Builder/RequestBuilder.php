@@ -35,7 +35,7 @@ class RequestBuilder
 
     private $options = [];
 
-    private $authType = '';
+    private $authType = 0;
 
     private $ssl = true;
 
@@ -55,7 +55,7 @@ class RequestBuilder
         $this->requestFactory = $requestFactory;
     }
 
-    public function auth(string $username, string $password, string $authType = ''): RequestBuilder
+    public function auth(string $username, string $password, int $authType = 0): RequestBuilder
     {
         return $this->authType($authType)->user($username, $password);
     }
@@ -68,7 +68,7 @@ class RequestBuilder
         return $this;
     }
 
-    public function authType(string $authType): RequestBuilder
+    public function authType(int $authType): RequestBuilder
     {
         $this->authType = $authType;
 
@@ -298,10 +298,9 @@ class RequestBuilder
         $this->method = $this->user = $this->password = $this->scheme =
         $this->host = $this->port = $this->uri = $this->body = null;
         $this->parameters = $this->headers = $this->options = [];
-        $this->authType = '';
         $this->ssl = true;
         $this->returnHeaders = $this->noProcess = false;
-        $this->connectMs = $this->timeoutMs = 0;
+        $this->authType = $this->connectMs = $this->timeoutMs = 0;
         $this->protocol = '1.1';
     }
 
