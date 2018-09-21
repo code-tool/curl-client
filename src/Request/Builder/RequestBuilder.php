@@ -433,7 +433,7 @@ class RequestBuilder
             $uri .= ':' . $this->port;
         }
         if ($this->path) {
-            $uri .= '/' . $this->path;
+            $uri .= '/' . ltrim($this->path, '/');
         }
         if ($this->query) {
             $uri .= '?' . $this->query;
