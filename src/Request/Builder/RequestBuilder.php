@@ -408,6 +408,7 @@ class RequestBuilder
                             throw new \RuntimeException(sprintf('Failed to json_encode body. Error: %s', $message));
                         }
                         break;
+                    case 'multipart/form-data':
                     case 'application/x-www-form-urlencoded':
                         $body = http_build_query($body);
                         break;
