@@ -187,8 +187,12 @@ class CurlRequest implements RequestInterface, \JsonSerializable
             if (method_exists($request, 'getParsedBody')) {
                 return $request->getParsedBody();
             }
+            $string = $request->getBody()->__toString();
+            if (false === \ctype_print($string)) {
+                return base64_encode($string);
+            }
 
-            return $request->getBody()->__toString();
+            return $string;
         } finally {
             if ($request->getBody()->isSeekable()) {
                 $request->getBody()->rewind();
@@ -202,17 +206,13 @@ class CurlRequest implements RequestInterface, \JsonSerializable
         foreach ($this->getHeaders() as $header => $values) {
             $headers[$header] = implode('; ', $values);
         }
-        $body = $this->pack($this->request);
-        if (false === \ctype_print($body)) {
-            $body = base64_encode($body);
-        }
 
         return [
             'host' => $this->getUri()->getHost(),
             'method' => $this->getMethod(),
             'uri' => $this->getUri()->getPath(),
             'headers' => $headers,
-            'body' => $body,
+            'body' => $this->pack($this->request),
         ];
     }
 
