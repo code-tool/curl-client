@@ -178,7 +178,7 @@ class CurlRequest implements RequestInterface, \JsonSerializable
         return $copy;
     }
 
-    public function pack(RequestInterface $request): string
+    public function pack(RequestInterface $request)
     {
         try {
             if ($request->getBody()->getSize() > 4096) {
