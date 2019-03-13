@@ -10,6 +10,7 @@
   "require": {
     "php": "^7.1",
     "ext-curl": "*",
+    "ext-json": "*",
     "ext-ctype": "*",
     "php-http/httplug": "^1",
     "php-http/message": "^1",
