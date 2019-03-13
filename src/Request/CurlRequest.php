@@ -178,19 +178,33 @@ class CurlRequest implements RequestInterface, \JsonSerializable
         return $copy;
     }
 
+    public function pack(RequestInterface $request): string
+    {
+        try {
+            if ($request->getBody()->getSize() > 4096) {
+                return '...';
+            }
+            if (method_exists($request, 'getParsedBody')) {
+                return $request->getParsedBody();
+            }
+
+            return $request->getBody()->__toString();
+        } finally {
+            if ($request->getBody()->isSeekable()) {
+                $request->getBody()->rewind();
+            }
+        }
+    }
+
     public function toArray()
     {
         $headers = [];
         foreach ($this->getHeaders() as $header => $values) {
             $headers[$header] = implode('; ', $values);
         }
-        if (method_exists($this->request, 'getParsedBody')) {
-            $body = $this->request->getParsedBody();
-        } else {
-            $body = $this->request->getBody()->getContents();
-        }
-        if ($this->request->getBody()->isSeekable()) {
-            $this->request->getBody()->rewind();
+        $body = $this->pack($this->request);
+        if (false === \ctype_print($body)) {
+            $body = base64_encode($body);
         }
 
         return [
