@@ -53,19 +53,15 @@ class CurlRequest implements RequestInterface, \JsonSerializable
             $options[CURLOPT_SSL_VERIFYPEER] = false;
             $options[CURLOPT_SSL_VERIFYHOST] = false;
         }
-
         if (0 !== $this->authType) {
             $options[CURLOPT_HTTPAUTH] = $this->authType;
         }
-
         if (0 !== $this->connectMs) {
             $options[CURLOPT_CONNECTTIMEOUT_MS] = $this->connectMs;
         }
-
         if (0 !== $this->timeoutMs) {
             $options[CURLOPT_TIMEOUT_MS] = $this->timeoutMs;
         }
-
         if ($this->returnHeaders) {
             $options[CURLOPT_HEADER] = true;
         }
@@ -188,15 +184,21 @@ class CurlRequest implements RequestInterface, \JsonSerializable
         foreach ($this->getHeaders() as $header => $values) {
             $headers[$header] = implode('; ', $values);
         }
+        if (method_exists($this->request, 'getParsedBody')) {
+            $body = $this->request->getParsedBody();
+        } else {
+            $body = $this->request->getBody()->getContents();
+        }
+        if ($this->request->getBody()->isSeekable()) {
+            $this->request->getBody()->rewind();
+        }
 
         return [
             'host' => $this->getUri()->getHost(),
             'method' => $this->getMethod(),
             'uri' => $this->getUri()->getPath(),
             'headers' => $headers,
-            'body' => method_exists($this->request, 'getParsedBody')
-                ? $this->request->getParsedBody()
-                : $this->getBody()->__toString(),
+            'body' => $body,
         ];
     }
 
