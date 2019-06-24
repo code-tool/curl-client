@@ -178,6 +178,11 @@ class CurlRequest implements RequestInterface, \JsonSerializable
         return $copy;
     }
 
+    public function getRequest(): RequestInterface
+    {
+        return $this->request;
+    }
+
     public function pack(RequestInterface $request)
     {
         try {
