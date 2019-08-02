@@ -7,7 +7,7 @@ use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\StreamInterface;
 use Psr\Http\Message\UriInterface;
 
-class CurlRequest implements RequestInterface, \JsonSerializable
+class CurlRequest implements RequestInterface
 {
     private $request;
 
@@ -181,48 +181,5 @@ class CurlRequest implements RequestInterface, \JsonSerializable
     public function getRequest(): RequestInterface
     {
         return $this->request;
-    }
-
-    public function pack(RequestInterface $request)
-    {
-        try {
-            if ($request->getBody()->getSize() > 4096) {
-                return '...';
-            }
-            if (method_exists($request, 'getParsedBody')) {
-                return $request->getParsedBody();
-            }
-            $string = (string)$request->getBody();
-            if (false === \ctype_print($string)) {
-                return base64_encode($string);
-            }
-
-            return $string;
-        } finally {
-            if ($request->getBody()->isSeekable()) {
-                $request->getBody()->rewind();
-            }
-        }
-    }
-
-    public function toArray(): array
-    {
-        $headers = [];
-        foreach ($this->getHeaders() as $header => $values) {
-            $headers[$header] = implode('; ', $values);
-        }
-
-        return [
-            'host' => $this->getUri()->getHost(),
-            'method' => $this->getMethod(),
-            'uri' => $this->getUri()->getPath(),
-            'headers' => $headers,
-            'body' => $this->pack($this->request),
-        ];
-    }
-
-    public function jsonSerialize(): array
-    {
-        return $this->toArray();
     }
 }

@@ -7,7 +7,7 @@ use Http\Client\Curl\CurlInfo;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\StreamInterface;
 
-class CurlResponse implements ResponseInterface, \JsonSerializable
+class CurlResponse implements ResponseInterface
 {
     private $response;
 
@@ -110,47 +110,5 @@ class CurlResponse implements ResponseInterface, \JsonSerializable
     public function curlInfo(): CurlInfo
     {
         return $this->curlInfo;
-    }
-
-    public function pack(ResponseInterface $response)
-    {
-        try {
-            if ($response->getBody()->getSize() > 4096) {
-                return '...';
-            }
-            if (method_exists($response, 'getParsedBody')) {
-                return $response->getParsedBody();
-            }
-            $string = (string)$response->getBody();
-            if (false === \ctype_print($string)) {
-                return base64_encode($string);
-            }
-
-            return $string;
-        } finally {
-            if ($response->getBody()->isSeekable()) {
-                $response->getBody()->rewind();
-            }
-        }
-    }
-
-    public function toArray()
-    {
-        $headers = [];
-        foreach ($this->getHeaders() as $header => $values) {
-            $headers[$header] = implode('; ', $values);
-        }
-
-        return [
-            'code' => $this->getStatusCode(),
-            'reason' => $this->getReasonPhrase(),
-            'headers' => $headers,
-            'body' => $this->pack($this->response),
-        ];
-    }
-
-    public function jsonSerialize()
-    {
-        return $this->toArray();
     }
 }
