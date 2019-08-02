@@ -69,7 +69,7 @@ class CurlRequest implements RequestInterface, \JsonSerializable
         return $options;
     }
 
-    public function getRequestTarget()
+    public function getRequestTarget(): string
     {
         return $this->request->getRequestTarget();
     }
@@ -82,7 +82,7 @@ class CurlRequest implements RequestInterface, \JsonSerializable
         return $copy;
     }
 
-    public function getMethod()
+    public function getMethod(): string
     {
         return $this->request->getMethod();
     }
@@ -95,7 +95,7 @@ class CurlRequest implements RequestInterface, \JsonSerializable
         return $copy;
     }
 
-    public function getUri()
+    public function getUri(): UriInterface
     {
         return $this->request->getUri();
     }
@@ -108,7 +108,7 @@ class CurlRequest implements RequestInterface, \JsonSerializable
         return $copy;
     }
 
-    public function getProtocolVersion()
+    public function getProtocolVersion(): string
     {
         return $this->request->getProtocolVersion();
     }
@@ -121,22 +121,22 @@ class CurlRequest implements RequestInterface, \JsonSerializable
         return $copy;
     }
 
-    public function getHeaders()
+    public function getHeaders(): array
     {
         return $this->request->getHeaders();
     }
 
-    public function hasHeader($name)
+    public function hasHeader($name): bool
     {
         return $this->request->hasHeader($name);
     }
 
-    public function getHeader($name)
+    public function getHeader($name): array
     {
         return $this->request->getHeader($name);
     }
 
-    public function getHeaderLine($name)
+    public function getHeaderLine($name): string
     {
         return $this->request->getHeaderLine($name);
     }
@@ -165,7 +165,7 @@ class CurlRequest implements RequestInterface, \JsonSerializable
         return $copy;
     }
 
-    public function getBody()
+    public function getBody(): StreamInterface
     {
         return $this->request->getBody();
     }
@@ -192,7 +192,7 @@ class CurlRequest implements RequestInterface, \JsonSerializable
             if (method_exists($request, 'getParsedBody')) {
                 return $request->getParsedBody();
             }
-            $string = $request->getBody()->__toString();
+            $string = (string)$request->getBody();
             if (false === \ctype_print($string)) {
                 return base64_encode($string);
             }
@@ -205,7 +205,7 @@ class CurlRequest implements RequestInterface, \JsonSerializable
         }
     }
 
-    public function toArray()
+    public function toArray(): array
     {
         $headers = [];
         foreach ($this->getHeaders() as $header => $values) {
@@ -221,7 +221,7 @@ class CurlRequest implements RequestInterface, \JsonSerializable
         ];
     }
 
-    public function jsonSerialize()
+    public function jsonSerialize(): array
     {
         return $this->toArray();
     }

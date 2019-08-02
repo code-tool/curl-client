@@ -93,7 +93,7 @@ class CurlChannelBuilder
     /**
      * @return CurlChannelBuilder
      */
-    public function setOptions()
+    public function setOptions(): CurlChannelBuilder
     {
         if (false === array_key_exists(CURLOPT_HEADER, $this->options)) {
             $this->options[CURLOPT_HEADER] = false;
@@ -123,7 +123,7 @@ class CurlChannelBuilder
 
     public function setUrl(): CurlChannelBuilder
     {
-        $this->options[CURLOPT_URL] = $this->request->getUri()->__toString();
+        $this->options[CURLOPT_URL] = (string)$this->request->getUri();
 
         return $this;
     }

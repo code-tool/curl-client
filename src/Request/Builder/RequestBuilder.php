@@ -4,12 +4,12 @@ declare(strict_types=1);
 namespace Http\Client\Curl\Request\Builder;
 
 use Http\Client\Curl\Request\CurlRequest;
-use Http\Message\RequestFactory;
-use Http\Message\UriFactory;
+use Psr\Http\Message\RequestFactoryInterface;
+use Psr\Http\Message\StreamFactoryInterface;
 
 class RequestBuilder
 {
-    private $uriFactory;
+    private $streamFactory;
 
     private $requestFactory;
 
@@ -53,9 +53,9 @@ class RequestBuilder
 
     private $protocol = '1.1';
 
-    public function __construct(UriFactory $uriFactory, RequestFactory $requestFactory)
+    public function __construct(StreamFactoryInterface $streamFactory, RequestFactoryInterface $requestFactory)
     {
-        $this->uriFactory = $uriFactory;
+        $this->streamFactory = $streamFactory;
         $this->requestFactory = $requestFactory;
     }
 
@@ -331,7 +331,7 @@ class RequestBuilder
         return $this->header('User-Agent', $userAgent);
     }
 
-    public function clean()
+    public function clean(): void
     {
         $this->method = $this->user = $this->password = $this->scheme =
         $this->host = $this->port = $this->path = $this->query = $this->fragment = $this->body = null;
@@ -442,14 +442,18 @@ class RequestBuilder
         if ($this->fragment) {
             $uri .= '#' . $this->fragment;
         }
+        if (is_resource($body)) {
+            $body = $this->streamFactory->createStreamFromResource($body);
+        } else {
+            $body = $this->streamFactory->createStream((string)$body);
+        }
         $request = $this->requestFactory
-            ->createRequest(
-                $this->method,
-                $uri,
-                $this->headers,
-                $body,
-                $this->protocol
-            );
+            ->createRequest($this->method, $uri)
+            ->withBody($body)
+            ->withProtocolVersion($this->protocol);
+        foreach ($this->headers as $header => $value) {
+            $request = $request->withHeader($header, $value);
+        }
         $request = new CurlRequest(
             $request,
             $this->connectMs,

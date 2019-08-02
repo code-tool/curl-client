@@ -19,7 +19,7 @@ class CurlResponse implements ResponseInterface, \JsonSerializable
         $this->curlInfo = $curlInfo;
     }
 
-    public function getProtocolVersion()
+    public function getProtocolVersion(): string
     {
         return $this->response->getProtocolVersion();
     }
@@ -32,22 +32,22 @@ class CurlResponse implements ResponseInterface, \JsonSerializable
         return $copy;
     }
 
-    public function getHeaders()
+    public function getHeaders(): array
     {
         return $this->response->getHeaders();
     }
 
-    public function hasHeader($name)
+    public function hasHeader($name): bool
     {
         return $this->response->hasHeader($name);
     }
 
-    public function getHeader($name)
+    public function getHeader($name): array
     {
         return $this->response->getHeader($name);
     }
 
-    public function getHeaderLine($name)
+    public function getHeaderLine($name): string
     {
         return $this->response->getHeaderLine($name);
     }
@@ -76,7 +76,7 @@ class CurlResponse implements ResponseInterface, \JsonSerializable
         return $copy;
     }
 
-    public function getBody()
+    public function getBody(): StreamInterface
     {
         return $this->response->getBody();
     }
@@ -89,7 +89,7 @@ class CurlResponse implements ResponseInterface, \JsonSerializable
         return $copy;
     }
 
-    public function getStatusCode()
+    public function getStatusCode(): int
     {
         return $this->response->getStatusCode();
     }
@@ -102,7 +102,7 @@ class CurlResponse implements ResponseInterface, \JsonSerializable
         return $copy;
     }
 
-    public function getReasonPhrase()
+    public function getReasonPhrase(): string
     {
         return $this->response->getReasonPhrase();
     }
@@ -121,7 +121,7 @@ class CurlResponse implements ResponseInterface, \JsonSerializable
             if (method_exists($response, 'getParsedBody')) {
                 return $response->getParsedBody();
             }
-            $string = $response->getBody()->__toString();
+            $string = (string)$response->getBody();
             if (false === \ctype_print($string)) {
                 return base64_encode($string);
             }
@@ -145,7 +145,7 @@ class CurlResponse implements ResponseInterface, \JsonSerializable
             'code' => $this->getStatusCode(),
             'reason' => $this->getReasonPhrase(),
             'headers' => $headers,
-            'body' => $this->pack($this->response)
+            'body' => $this->pack($this->response),
         ];
     }
 

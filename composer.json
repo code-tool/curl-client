@@ -12,8 +12,8 @@
     "ext-curl": "*",
     "ext-json": "*",
     "ext-ctype": "*",
-    "php-http/httplug": "^1",
-    "php-http/message": "^1"
+    "psr/http-client": "^1",
+    "psr/http-factory": "^1.0.1"
   },
   "autoload": {
     "psr-4": {
