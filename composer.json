@@ -13,8 +13,7 @@
     "ext-json": "*",
     "ext-ctype": "*",
     "php-http/httplug": "^1",
-    "php-http/message": "^1",
-    "slim/slim": "^3"
+    "php-http/message": "^1"
   },
   "autoload": {
     "psr-4": {
