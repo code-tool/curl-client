@@ -14,7 +14,7 @@
     "ext-ctype": "*",
     "php-http/httplug": "^1",
     "php-http/message": "^1",
-    "slim/slim": "@stable"
+    "slim/slim": "^3"
   },
   "autoload": {
     "psr-4": {
