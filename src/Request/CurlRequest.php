@@ -182,4 +182,12 @@ class CurlRequest implements RequestInterface
     {
         return $this->request;
     }
+
+    public function withRequest(RequestInterface $request): CurlRequest
+    {
+        $copy = clone $this;
+        $copy->request = $request;
+
+        return $copy;
+    }
 }
