@@ -33,6 +33,7 @@ class CurlChannel
         $this->channel = $channel;
         $this->request = $request;
         $this->response = $response;
+        $this->current = $response;
     }
 
     public function read($channel, $fileDescriptor, $length): string
@@ -75,7 +76,7 @@ class CurlChannel
         curl_exec($this->channel);
         switch (curl_errno($this->channel)) {
             case CURLE_OK:
-                return new CurlResponse($this->response, new CurlInfo(curl_getinfo($this->channel)));
+                return new CurlResponse($this->current, new CurlInfo(curl_getinfo($this->channel)));
                 break;
             case CURLE_COULDNT_RESOLVE_PROXY:
             case CURLE_COULDNT_RESOLVE_HOST:
