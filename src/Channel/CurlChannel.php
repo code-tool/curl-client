@@ -19,6 +19,8 @@ class CurlChannel
 
     private $response;
 
+    private $current;
+
     /**
      * CurlChannel constructor.
      *
@@ -50,18 +52,19 @@ class CurlChannel
             return strlen($data);
         }
         if (0 === stripos($str, 'http/')) {
+            $this->current = clone $this->response;
             [$protocol, $code,] = explode(' ', $str, 3);
-            $this->response = $this->response->withStatus((int)$code);
+            $this->current = $this->current->withStatus((int)$code);
 
             return strlen($data);
         }
         [$name, $value,] = explode(':', $str, 2);
         $name = trim($name);
         $value = trim($value);
-        if ($this->response->hasHeader($name)) {
-            $this->response = $this->response->withAddedHeader($name, $value);
+        if ($this->current->hasHeader($name)) {
+            $this->current = $this->current->withAddedHeader($name, $value);
         } else {
-            $this->response = $this->response->withHeader($name, $value);
+            $this->current = $this->current->withHeader($name, $value);
         }
 
         return strlen($data);
