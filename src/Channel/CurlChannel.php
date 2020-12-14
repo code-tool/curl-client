@@ -7,6 +7,7 @@ use Http\Client\Curl\CurlInfo;
 use Http\Client\Curl\Exception\ConnectException;
 use Http\Client\Curl\Exception\RequestException;
 use Http\Client\Curl\Exception\ResolveException;
+use Http\Client\Curl\Exception\TimeoutException;
 use Http\Client\Curl\Response\CurlResponse;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -82,9 +83,10 @@ class CurlChannel
             case CURLE_COULDNT_RESOLVE_HOST:
                 throw new ResolveException($this->request, curl_error($this->channel));
             case CURLE_COULDNT_CONNECT:
-            case CURLE_OPERATION_TIMEOUTED:
             case CURLE_SSL_CONNECT_ERROR:
                 throw new ConnectException($this->request, curl_error($this->channel));
+            case CURLE_OPERATION_TIMEOUTED:
+                throw new TimeoutException($this->request, curl_error($this->channel));
             default:
                 throw new RequestException($this->request, curl_error($this->channel));
         }
