@@ -5,7 +5,7 @@
     "keywords": ["http", "curl"],
     "prefer-stable": true,
     "require": {
-        "php": "^7.1",
+        "php": "^7.1 || ^8.0",
         "ext-curl": "*",
         "php-http/httplug": "^1",
         "php-http/message": "^1",
