@@ -6,11 +6,12 @@ namespace Http\Client\Curl;
 use Http\Client\Curl\Channel\Builder\CurlChannelBuilder;
 use Http\Client\Curl\Request\CurlRequest;
 use Http\Client\Curl\Response\CurlResponse;
-use Http\Client\HttpClient;
-use Http\Message\ResponseFactory as ResponseFactoryInterface;
+use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message\RequestInterface;
+use Psr\Http\Message\ResponseFactoryInterface;
+use Psr\Http\Message\ResponseInterface;
 
-class CurlClient implements CurlClientInterface, HttpClient
+class CurlClient implements CurlClientInterface, ClientInterface
 {
     private $resource;
 
@@ -52,7 +53,7 @@ class CurlClient implements CurlClientInterface, HttpClient
      *
      * @return CurlResponse
      */
-    public function sendRequest(RequestInterface $request)
+    public function sendRequest(RequestInterface $request): ResponseInterface
     {
         if (false === is_resource($this->resource)) {
             $this->resource = curl_init();

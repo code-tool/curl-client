@@ -3,10 +3,10 @@ declare(strict_types=1);
 
 namespace Http\Client\Curl\Exception;
 
-use Psr\Http\Client\NetworkExceptionInterface;
+use Psr\Http\Client\RequestExceptionInterface;
 use Psr\Http\Message\RequestInterface;
 
-class ResolveException extends \RuntimeException implements NetworkExceptionInterface
+class RequestException extends \RuntimeException implements RequestExceptionInterface
 {
     private $request;
 

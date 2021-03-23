@@ -1,28 +1,32 @@
 {
-    "name": "code-tool/curl-client",
-    "description": "cURL client",
-    "license": "MIT",
-    "keywords": ["http", "curl"],
-    "prefer-stable": true,
-    "require": {
-        "php": "^7.1 || ^8.0",
-        "ext-curl": "*",
-        "php-http/httplug": "^1",
-        "php-http/message": "^1",
-        "slim/slim": "@stable"
-    },
-    "autoload": {
-        "psr-4": {
-            "Http\\Client\\Curl\\": "src/"
-        }
-    },
-    "autoload-dev": {
-        "psr-4": {
-            "Http\\Client\\Curl\\Tests\\": "tests/"
-        }
-    },
-    "provide": {
-        "php-http/client-implementation": "1.0",
-        "php-http/curl": "1.7"
+  "name": "code-tool/curl-client",
+  "description": "cURL client",
+  "license": "MIT",
+  "keywords": [
+    "http",
+    "curl"
+  ],
+  "prefer-stable": true,
+  "require": {
+    "php": "^7.1 || ^8.0",
+    "ext-curl": "*",
+    "ext-json": "*",
+    "ext-ctype": "*",
+    "psr/http-client": "^1",
+    "psr/http-factory": "^1.0.1"
+  },
+  "autoload": {
+    "psr-4": {
+      "Http\\Client\\Curl\\": "src/"
     }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Http\\Client\\Curl\\Tests\\": "tests/"
+    }
+  },
+  "provide": {
+    "php-http/client-implementation": "1.0",
+    "php-http/curl": "1.7"
+  }
 }

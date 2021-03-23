@@ -6,7 +6,7 @@ namespace Http\Client\Curl\Exception;
 use Psr\Http\Client\NetworkExceptionInterface;
 use Psr\Http\Message\RequestInterface;
 
-class ResolveException extends \RuntimeException implements NetworkExceptionInterface
+abstract class AbstractNetworkException extends \RuntimeException implements NetworkExceptionInterface
 {
     private $request;
 

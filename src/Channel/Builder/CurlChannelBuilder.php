@@ -62,7 +62,7 @@ class CurlChannelBuilder
 
     public function consistent(): CurlChannelBuilder
     {
-        if (false === is_resource($this->channel)) {
+        if (false === \is_resource($this->channel)) {
             throw new \RuntimeException('You forgot to set channel resource');
         }
         if (null === $this->request) {
@@ -77,7 +77,7 @@ class CurlChannelBuilder
 
     public function reset(): CurlChannelBuilder
     {
-        curl_reset($this->channel);
+        \curl_reset($this->channel);
 
         return $this;
     }
@@ -93,13 +93,15 @@ class CurlChannelBuilder
     /**
      * @return CurlChannelBuilder
      */
-    public function setOptions()
+    public function setOptions(): CurlChannelBuilder
     {
-        if (false === array_key_exists(CURLOPT_HEADER, $this->options)) {
+        if (false === \array_key_exists(CURLOPT_HEADER, $this->options)) {
             $this->options[CURLOPT_HEADER] = false;
         }
-        $this->options[CURLOPT_FOLLOWLOCATION] = false;
-        curl_setopt_array($this->channel, $this->options);
+        if (false === \array_key_exists(CURLOPT_FOLLOWLOCATION, $this->options)) {
+            $this->options[CURLOPT_FOLLOWLOCATION] = false;
+        }
+        \curl_setopt_array($this->channel, $this->options);
 
         return $this;
     }
@@ -123,7 +125,7 @@ class CurlChannelBuilder
 
     public function setUrl(): CurlChannelBuilder
     {
-        $this->options[CURLOPT_URL] = $this->request->getUri()->__toString();
+        $this->options[CURLOPT_URL] = (string)$this->request->getUri();
 
         return $this;
     }
@@ -132,7 +134,7 @@ class CurlChannelBuilder
     {
         foreach ($this->request->getHeaders() as $name => $values) {
             foreach ($values as $value) {
-                $this->options[CURLOPT_HTTPHEADER][] = sprintf('%s: %s', $name, $value);
+                $this->options[CURLOPT_HTTPHEADER][] = \sprintf('%s: %s', $name, $value);
             }
         }
 
@@ -149,9 +151,16 @@ class CurlChannelBuilder
         return $this;
     }
 
+    public function setPort(): CurlChannelBuilder
+    {
+        $this->options[CURLOPT_PORT] = $this->request->getUri()->getPort();
+
+        return $this;
+    }
+
     public function setMethod(): CurlChannelBuilder
     {
-        switch (strtoupper($this->request->getMethod())) {
+        switch (\strtoupper($this->request->getMethod())) {
             case 'GET':
                 break;
             case 'HEAD':
@@ -168,7 +177,7 @@ class CurlChannelBuilder
 
     public function setBodySize(): CurlChannelBuilder
     {
-        if (in_array(strtoupper($this->request->getMethod()), ['GET', 'HEAD', 'TRACE'])) {
+        if (\in_array(\strtoupper($this->request->getMethod()), ['GET', 'HEAD', 'TRACE'])) {
             return $this;
         }
 
@@ -203,6 +212,7 @@ class CurlChannelBuilder
             ->setMethod()
             ->setBodySize()
             ->setHttpVersion()
+            ->setPort()
             ->setUrl()
             ->setHeaders()
             ->setUserInfo()
