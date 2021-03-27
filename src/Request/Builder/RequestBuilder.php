@@ -285,6 +285,7 @@ class RequestBuilder
             case 'POST':
             case 'PUT':
             case 'PATCH':
+            case 'DELETE':
                 if (false === array_key_exists('Content-Type', $this->headers)) {
                     break;
                 }
