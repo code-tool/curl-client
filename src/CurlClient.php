@@ -15,7 +15,7 @@ use Psr\Http\Message\ResponseInterface;
 class CurlClient implements CurlClientInterface, ClientInterface
 {
     /**
-     * @var resource|CurlHandle|false
+     * @var resource|CurlHandle|false|null
      */
     private $resource;
 
