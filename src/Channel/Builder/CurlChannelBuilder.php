@@ -66,8 +66,7 @@ class CurlChannelBuilder
 
     public function consistent(): CurlChannelBuilder
     {
-        $isResource = is_resource($this->channel) || (PHP_MAJOR_VERSION > 7 && $this->channel instanceof CurlHandle);
-        if (false === $isResource) {
+        if (false === $this->isChannelResource()) {
             throw new \RuntimeException('You forgot to set channel resource');
         }
         if (null === $this->request) {
@@ -78,6 +77,11 @@ class CurlChannelBuilder
         }
 
         return $this;
+    }
+
+    private function isChannelResource(): bool
+    {
+        return is_resource($this->channel) || (PHP_MAJOR_VERSION > 7 && $this->channel instanceof CurlHandle);
     }
 
     public function reset(): CurlChannelBuilder
