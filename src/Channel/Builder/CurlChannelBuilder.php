@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Http\Client\Curl\Channel\Builder;
 
 use Http\Client\Curl\Channel\CurlChannel;
+use Http\Client\Curl\Compatibility\CurlResourceChecker;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 
@@ -62,7 +63,7 @@ class CurlChannelBuilder
 
     public function consistent(): CurlChannelBuilder
     {
-        if (false === \is_resource($this->channel)) {
+        if (false === CurlResourceChecker::isCurlResource($this->channel)) {
             throw new \RuntimeException('You forgot to set channel resource');
         }
         if (null === $this->request) {
