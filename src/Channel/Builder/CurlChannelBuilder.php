@@ -3,8 +3,8 @@ declare(strict_types=1);
 
 namespace Http\Client\Curl\Channel\Builder;
 
+use CurlHandle;
 use Http\Client\Curl\Channel\CurlChannel;
-use Http\Client\Curl\Compatibility\CurlResourceChecker;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 
@@ -26,6 +26,9 @@ class CurlChannelBuilder
 
     private $result;
 
+    /**
+     * @param resource|CurlHandle $channel
+     */
     public function channel($channel): CurlChannelBuilder
     {
         $this->channel = $channel;
@@ -63,7 +66,8 @@ class CurlChannelBuilder
 
     public function consistent(): CurlChannelBuilder
     {
-        if (false === CurlResourceChecker::isCurlResource($this->channel)) {
+        $isResource = is_resource($this->channel) || (PHP_MAJOR_VERSION > 7 && $this->channel instanceof CurlHandle);
+        if (false === $isResource) {
             throw new \RuntimeException('You forgot to set channel resource');
         }
         if (null === $this->request) {

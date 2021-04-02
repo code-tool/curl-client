@@ -3,8 +3,8 @@ declare(strict_types=1);
 
 namespace Http\Client\Curl;
 
+use CurlHandle;
 use Http\Client\Curl\Channel\Builder\CurlChannelBuilder;
-use Http\Client\Curl\Compatibility\CurlResourceChecker;
 use Http\Client\Curl\Request\CurlRequest;
 use Http\Client\Curl\Response\CurlResponse;
 use Psr\Http\Client\ClientInterface;
@@ -14,6 +14,9 @@ use Psr\Http\Message\ResponseInterface;
 
 class CurlClient implements CurlClientInterface, ClientInterface
 {
+    /**
+     * @var resource|CurlHandle|false
+     */
     private $resource;
 
     private $options;
@@ -36,7 +39,7 @@ class CurlClient implements CurlClientInterface, ClientInterface
 
     public function __destruct()
     {
-        if (false === CurlResourceChecker::isCurlResource($this->resource)) {
+        if (false === $this->resource || null === $this->resource) {
             return;
         }
         curl_close($this->resource);
@@ -56,7 +59,7 @@ class CurlClient implements CurlClientInterface, ClientInterface
      */
     public function sendRequest(RequestInterface $request): ResponseInterface
     {
-        if (false === CurlResourceChecker::isCurlResource($this->resource)) {
+        if (false === $this->resource || null === $this->resource) {
             $this->resource = curl_init();
         }
 
