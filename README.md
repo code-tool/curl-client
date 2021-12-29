@@ -1,10 +1,8 @@
-
 # PHP Curl Client 
-
 
 ## Installation
 
-```
+```bash
 composer require code-tool/curl-client
 ```
 
