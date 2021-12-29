@@ -74,6 +74,9 @@ class CurlRequest implements RequestInterface
         return $this->request->getRequestTarget();
     }
 
+    /**
+     * @return static
+     */
     public function withRequestTarget($requestTarget)
     {
         $copy = clone $this;
@@ -87,6 +90,9 @@ class CurlRequest implements RequestInterface
         return $this->request->getMethod();
     }
 
+    /**
+     * @return static
+     */
     public function withMethod($method)
     {
         $copy = clone $this;
@@ -100,6 +106,9 @@ class CurlRequest implements RequestInterface
         return $this->request->getUri();
     }
 
+    /**
+     * @return static
+     */
     public function withUri(UriInterface $uri, $preserveHost = false)
     {
         $copy = clone $this;
@@ -113,6 +122,9 @@ class CurlRequest implements RequestInterface
         return $this->request->getProtocolVersion();
     }
 
+    /**
+     * @return static
+     */
     public function withProtocolVersion($version)
     {
         $copy = clone $this;
@@ -141,6 +153,9 @@ class CurlRequest implements RequestInterface
         return $this->request->getHeaderLine($name);
     }
 
+    /**
+     * @return static
+     */
     public function withHeader($name, $value)
     {
         $copy = clone $this;
@@ -149,6 +164,9 @@ class CurlRequest implements RequestInterface
         return $copy;
     }
 
+    /**
+     * @return static
+     */
     public function withAddedHeader($name, $value)
     {
         $copy = clone $this;
@@ -157,6 +175,9 @@ class CurlRequest implements RequestInterface
         return $copy;
     }
 
+    /**
+     * @return static
+     */
     public function withoutHeader($name)
     {
         $copy = clone $this;
@@ -170,6 +191,9 @@ class CurlRequest implements RequestInterface
         return $this->request->getBody();
     }
 
+    /**
+     * @return static
+     */
     public function withBody(StreamInterface $body)
     {
         $copy = clone $this;
