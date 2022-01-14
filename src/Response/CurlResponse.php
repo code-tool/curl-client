@@ -24,6 +24,9 @@ class CurlResponse implements ResponseInterface
         return $this->response->getProtocolVersion();
     }
 
+    /**
+     * @return static
+     */
     public function withProtocolVersion($version)
     {
         $copy = clone $this;
@@ -52,6 +55,9 @@ class CurlResponse implements ResponseInterface
         return $this->response->getHeaderLine($name);
     }
 
+    /**
+     * @return static
+     */
     public function withHeader($name, $value)
     {
         $copy = clone $this;
@@ -60,6 +66,9 @@ class CurlResponse implements ResponseInterface
         return $copy;
     }
 
+    /**
+     * @return static
+     */
     public function withAddedHeader($name, $value)
     {
         $copy = clone $this;
@@ -68,6 +77,9 @@ class CurlResponse implements ResponseInterface
         return $copy;
     }
 
+    /**
+     * @return static
+     */
     public function withoutHeader($name)
     {
         $copy = clone $this;
@@ -81,6 +93,9 @@ class CurlResponse implements ResponseInterface
         return $this->response->getBody();
     }
 
+    /**
+     * @return static
+     */
     public function withBody(StreamInterface $body)
     {
         $copy = clone $this;
@@ -94,6 +109,9 @@ class CurlResponse implements ResponseInterface
         return $this->response->getStatusCode();
     }
 
+    /**
+     * @return static
+     */
     public function withStatus($code, $reasonPhrase = '')
     {
         $copy = clone $this;

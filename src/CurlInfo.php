@@ -39,11 +39,19 @@ class CurlInfo implements \ArrayAccess, \Countable, \IteratorAggregate
         $this->info = $info;
     }
 
+    /**
+     * @return \Traversable
+     */
+    #[\ReturnTypeWillChange]
     public function getIterator()
     {
         return new \ArrayIterator($this->info);
     }
 
+    /**
+     * @return int
+     */
+    #[\ReturnTypeWillChange]
     public function count()
     {
         return count($this->info);
@@ -58,11 +66,19 @@ class CurlInfo implements \ArrayAccess, \Countable, \IteratorAggregate
         return $this->offsetGet($key);
     }
 
+    /**
+     * @return bool
+     */
+    #[\ReturnTypeWillChange]
     public function offsetExists($offset)
     {
         return array_key_exists($offset, $this->info);
     }
 
+    /**
+     * @return mixed
+     */
+    #[\ReturnTypeWillChange]
     public function offsetGet($offset)
     {
         if (false === $this->offsetExists($offset)) {
@@ -72,11 +88,19 @@ class CurlInfo implements \ArrayAccess, \Countable, \IteratorAggregate
         return $this->info[$offset];
     }
 
+    /**
+     * @return void
+     */
+    #[\ReturnTypeWillChange]
     public function offsetSet($offset, $value)
     {
         $this->info[$offset] = $value;
     }
 
+    /**
+     * @return void
+     */
+    #[\ReturnTypeWillChange]
     public function offsetUnset($offset)
     {
         if (false === $this->offsetExists($offset)) {
@@ -214,5 +238,4 @@ class CurlInfo implements \ArrayAccess, \Countable, \IteratorAggregate
     {
         return $this->get(self::CURL_LOCAL_PORT);
     }
-
 }
