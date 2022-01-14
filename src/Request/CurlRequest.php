@@ -11,24 +11,72 @@ class CurlRequest implements RequestInterface
 {
     private $request;
 
+    private $connectMs;
+
+    private $timeoutMs;
+
+    private $ssl;
+
+    private $authType;
+
+    private $returnHeaders;
+
     private $options;
 
-    public function __construct(RequestInterface $request, array $options)
-    {
+    public function __construct(
+        RequestInterface $request,
+        int $connectMs,
+        int $timeoutMs,
+        bool $ssl,
+        int $authType,
+        bool $returnHeaders,
+        array $options
+    ) {
         $this->request = $request;
+        $this->connectMs = $connectMs;
+        $this->timeoutMs = $timeoutMs;
+        $this->ssl = $ssl;
+        $this->authType = $authType;
+        $this->returnHeaders = $returnHeaders;
         $this->options = $options;
+    }
+
+    public function ssl(): bool
+    {
+        return $this->ssl;
     }
 
     public function options(): array
     {
-        return $this->options;
+        $options = $this->options;
+        if (false === $this->ssl) {
+            $options[CURLOPT_SSL_VERIFYPEER] = false;
+            $options[CURLOPT_SSL_VERIFYHOST] = false;
+        }
+        if (0 !== $this->authType) {
+            $options[CURLOPT_HTTPAUTH] = $this->authType;
+        }
+        if (0 !== $this->connectMs) {
+            $options[CURLOPT_CONNECTTIMEOUT_MS] = $this->connectMs;
+        }
+        if (0 !== $this->timeoutMs) {
+            $options[CURLOPT_TIMEOUT_MS] = $this->timeoutMs;
+        }
+        if ($this->returnHeaders) {
+            $options[CURLOPT_HEADER] = true;
+        }
+
+        return $options;
     }
 
-    public function getRequestTarget()
+    public function getRequestTarget(): string
     {
         return $this->request->getRequestTarget();
     }
 
+    /**
+     * @return static
+     */
     public function withRequestTarget($requestTarget)
     {
         $copy = clone $this;
@@ -37,11 +85,14 @@ class CurlRequest implements RequestInterface
         return $copy;
     }
 
-    public function getMethod()
+    public function getMethod(): string
     {
         return $this->request->getMethod();
     }
 
+    /**
+     * @return static
+     */
     public function withMethod($method)
     {
         $copy = clone $this;
@@ -50,11 +101,14 @@ class CurlRequest implements RequestInterface
         return $copy;
     }
 
-    public function getUri()
+    public function getUri(): UriInterface
     {
         return $this->request->getUri();
     }
 
+    /**
+     * @return static
+     */
     public function withUri(UriInterface $uri, $preserveHost = false)
     {
         $copy = clone $this;
@@ -63,11 +117,14 @@ class CurlRequest implements RequestInterface
         return $copy;
     }
 
-    public function getProtocolVersion()
+    public function getProtocolVersion(): string
     {
         return $this->request->getProtocolVersion();
     }
 
+    /**
+     * @return static
+     */
     public function withProtocolVersion($version)
     {
         $copy = clone $this;
@@ -76,26 +133,29 @@ class CurlRequest implements RequestInterface
         return $copy;
     }
 
-    public function getHeaders()
+    public function getHeaders(): array
     {
         return $this->request->getHeaders();
     }
 
-    public function hasHeader($name)
+    public function hasHeader($name): bool
     {
         return $this->request->hasHeader($name);
     }
 
-    public function getHeader($name)
+    public function getHeader($name): array
     {
         return $this->request->getHeader($name);
     }
 
-    public function getHeaderLine($name)
+    public function getHeaderLine($name): string
     {
         return $this->request->getHeaderLine($name);
     }
 
+    /**
+     * @return static
+     */
     public function withHeader($name, $value)
     {
         $copy = clone $this;
@@ -104,6 +164,9 @@ class CurlRequest implements RequestInterface
         return $copy;
     }
 
+    /**
+     * @return static
+     */
     public function withAddedHeader($name, $value)
     {
         $copy = clone $this;
@@ -112,6 +175,9 @@ class CurlRequest implements RequestInterface
         return $copy;
     }
 
+    /**
+     * @return static
+     */
     public function withoutHeader($name)
     {
         $copy = clone $this;
@@ -120,11 +186,14 @@ class CurlRequest implements RequestInterface
         return $copy;
     }
 
-    public function getBody()
+    public function getBody(): StreamInterface
     {
         return $this->request->getBody();
     }
 
+    /**
+     * @return static
+     */
     public function withBody(StreamInterface $body)
     {
         $copy = clone $this;
@@ -133,19 +202,16 @@ class CurlRequest implements RequestInterface
         return $copy;
     }
 
-    public function toArray()
+    public function getRequest(): RequestInterface
     {
-        $headers = [];
-        foreach ($this->getHeaders() as $header => $values) {
-            $headers[$header] = implode('; ', $values);
-        }
+        return $this->request;
+    }
 
-        return [
-            'host' => $this->getUri()->getHost(),
-            'method' => $this->getMethod(),
-            'uri' => $this->getUri()->getPath(),
-            'headers' => $headers,
-            'body' => $this->getBody()->__toString(),
-        ];
+    public function withRequest(RequestInterface $request): CurlRequest
+    {
+        $copy = clone $this;
+        $copy->request = $request;
+
+        return $copy;
     }
 }

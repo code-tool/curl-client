@@ -19,11 +19,14 @@ class CurlResponse implements ResponseInterface
         $this->curlInfo = $curlInfo;
     }
 
-    public function getProtocolVersion()
+    public function getProtocolVersion(): string
     {
         return $this->response->getProtocolVersion();
     }
 
+    /**
+     * @return static
+     */
     public function withProtocolVersion($version)
     {
         $copy = clone $this;
@@ -32,26 +35,29 @@ class CurlResponse implements ResponseInterface
         return $copy;
     }
 
-    public function getHeaders()
+    public function getHeaders(): array
     {
         return $this->response->getHeaders();
     }
 
-    public function hasHeader($name)
+    public function hasHeader($name): bool
     {
         return $this->response->hasHeader($name);
     }
 
-    public function getHeader($name)
+    public function getHeader($name): array
     {
         return $this->response->getHeader($name);
     }
 
-    public function getHeaderLine($name)
+    public function getHeaderLine($name): string
     {
         return $this->response->getHeaderLine($name);
     }
 
+    /**
+     * @return static
+     */
     public function withHeader($name, $value)
     {
         $copy = clone $this;
@@ -60,6 +66,9 @@ class CurlResponse implements ResponseInterface
         return $copy;
     }
 
+    /**
+     * @return static
+     */
     public function withAddedHeader($name, $value)
     {
         $copy = clone $this;
@@ -68,6 +77,9 @@ class CurlResponse implements ResponseInterface
         return $copy;
     }
 
+    /**
+     * @return static
+     */
     public function withoutHeader($name)
     {
         $copy = clone $this;
@@ -76,11 +88,14 @@ class CurlResponse implements ResponseInterface
         return $copy;
     }
 
-    public function getBody()
+    public function getBody(): StreamInterface
     {
         return $this->response->getBody();
     }
 
+    /**
+     * @return static
+     */
     public function withBody(StreamInterface $body)
     {
         $copy = clone $this;
@@ -89,11 +104,14 @@ class CurlResponse implements ResponseInterface
         return $copy;
     }
 
-    public function getStatusCode()
+    public function getStatusCode(): int
     {
         return $this->response->getStatusCode();
     }
 
+    /**
+     * @return static
+     */
     public function withStatus($code, $reasonPhrase = '')
     {
         $copy = clone $this;
@@ -102,7 +120,7 @@ class CurlResponse implements ResponseInterface
         return $copy;
     }
 
-    public function getReasonPhrase()
+    public function getReasonPhrase(): string
     {
         return $this->response->getReasonPhrase();
     }
@@ -110,20 +128,5 @@ class CurlResponse implements ResponseInterface
     public function curlInfo(): CurlInfo
     {
         return $this->curlInfo;
-    }
-
-    public function toArray()
-    {
-        $headers = [];
-        foreach ($this->getHeaders() as $header => $values) {
-            $headers[$header] = implode('; ', $values);
-        }
-
-        return [
-            'code' => $this->getStatusCode(),
-            'reason' => $this->getReasonPhrase(),
-            'headers' => $headers,
-            'body' => $this->getBody()->__toString(),
-        ];
     }
 }
