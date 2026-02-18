@@ -190,11 +190,7 @@ class CurlChannelBuilder
             return $this;
         }
 
-        $this->options[CURLOPT_UPLOAD] = true;
-        if (null === ($size = $this->request->getBody()->getSize())) {
-            return $this;
-        }
-        $this->options[CURLOPT_INFILESIZE] = $size;
+        $this->options[CURLOPT_POSTFIELDS] = (string) $this->request->getBody();
 
         return $this;
     }
