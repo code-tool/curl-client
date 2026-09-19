@@ -77,7 +77,7 @@ class CurlRequest implements RequestInterface
     /**
      * @return static
      */
-    public function withRequestTarget($requestTarget)
+    public function withRequestTarget($requestTarget): self
     {
         $copy = clone $this;
         $copy->request = $this->request->withRequestTarget($requestTarget);
@@ -93,7 +93,7 @@ class CurlRequest implements RequestInterface
     /**
      * @return static
      */
-    public function withMethod($method)
+    public function withMethod($method): self
     {
         $copy = clone $this;
         $copy->request = $this->request->withMethod($method);
@@ -109,7 +109,7 @@ class CurlRequest implements RequestInterface
     /**
      * @return static
      */
-    public function withUri(UriInterface $uri, $preserveHost = false)
+    public function withUri(UriInterface $uri, $preserveHost = false): self
     {
         $copy = clone $this;
         $copy->request = $this->request->withUri($uri, $preserveHost);
@@ -125,7 +125,7 @@ class CurlRequest implements RequestInterface
     /**
      * @return static
      */
-    public function withProtocolVersion($version)
+    public function withProtocolVersion($version): self
     {
         $copy = clone $this;
         $copy->request = $this->request->withProtocolVersion($version);
@@ -156,7 +156,7 @@ class CurlRequest implements RequestInterface
     /**
      * @return static
      */
-    public function withHeader($name, $value)
+    public function withHeader($name, $value): self
     {
         $copy = clone $this;
         $copy->request = $this->request->withHeader($name, $value);
@@ -167,7 +167,7 @@ class CurlRequest implements RequestInterface
     /**
      * @return static
      */
-    public function withAddedHeader($name, $value)
+    public function withAddedHeader($name, $value): self
     {
         $copy = clone $this;
         $copy->request = $this->request->withAddedHeader($name, $value);
@@ -178,7 +178,7 @@ class CurlRequest implements RequestInterface
     /**
      * @return static
      */
-    public function withoutHeader($name)
+    public function withoutHeader($name): self
     {
         $copy = clone $this;
         $copy->request = $this->request->withoutHeader($name);
@@ -194,7 +194,7 @@ class CurlRequest implements RequestInterface
     /**
      * @return static
      */
-    public function withBody(StreamInterface $body)
+    public function withBody(StreamInterface $body): self
     {
         $copy = clone $this;
         $copy->request = $this->request->withBody($body);
